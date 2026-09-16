@@ -1,0 +1,209 @@
+@import "tailwindcss";
+
+/*
+ * ZMS design tokens.
+ * The default Tailwind palette is cleared so only the four brand colours
+ * (plus white for forms/cards) can be used anywhere in the codebase.
+ */
+@theme {
+  --color-*: initial;
+  --color-navy: #081f2d;
+  --color-gold: #c89a3d;
+  --color-ivory: #fbf6ea;
+  --color-charcoal: #172b36;
+  --color-white: #ffffff;
+
+  --font-*: initial;
+  --font-serif: var(--font-cormorant), Georgia, serif;
+  --font-sans: var(--font-montserrat), Arial, sans-serif;
+
+  --radius-ui: 5px;
+  --radius-card: 10px;
+
+  --ease-zms: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Container: 1240px max, generous side gutters */
+@utility wrap {
+  width: 100%;
+  max-width: calc(1240px + 2 * 24px);
+  margin-inline: auto;
+  padding-inline: 24px;
+  @media (width >= 48rem) {
+    max-width: calc(1240px + 2 * 32px);
+    padding-inline: 32px;
+  }
+}
+
+/* Section rhythm: 56–72px mobile, 80–120px desktop */
+@utility section-y {
+  padding-block: 64px;
+  @media (width >= 64rem) {
+    padding-block: 112px;
+  }
+}
+
+/* Typography scale */
+@utility type-hero {
+  font-family: var(--font-serif);
+  font-weight: 600;
+  font-size: clamp(2.625rem, 1.6rem + 3.9vw, 4.75rem); /* 42 → 76px */
+  line-height: 1.04;
+  letter-spacing: -0.01em;
+}
+@utility type-section {
+  font-family: var(--font-serif);
+  font-weight: 600;
+  font-size: clamp(2.125rem, 1.7rem + 1.3vw, 3rem); /* 34 → 48px */
+  line-height: 1.1;
+  letter-spacing: -0.005em;
+}
+@utility type-card {
+  font-family: var(--font-serif);
+  font-weight: 600;
+  font-size: clamp(1.625rem, 1.45rem + 0.5vw, 1.875rem); /* 26 → 30px */
+  line-height: 1.15;
+}
+@utility type-label {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 0.75rem; /* 12px */
+  line-height: 1.2;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+@utility type-lead {
+  font-size: 1.0625rem;
+  line-height: 1.7;
+  @media (width >= 64rem) {
+    font-size: 1.125rem;
+  }
+}
+@utility measure {
+  max-width: 68ch;
+}
+
+/* Short tapered gold rule (approved exception) */
+@utility rule-taper {
+  display: block;
+  height: 1.5px;
+  width: 48px;
+  background: linear-gradient(90deg, transparent, var(--color-gold) 35%, var(--color-gold) 65%, transparent);
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    background: var(--color-ivory);
+    color: var(--color-charcoal);
+    font-family: var(--font-sans);
+    font-size: 1rem;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+    @media (width >= 64rem) {
+      font-size: 1.0625rem;
+    }
+  }
+  h1,
+  h2,
+  h3 {
+    color: var(--color-navy);
+    text-wrap: balance;
+  }
+  ::selection {
+    background: var(--color-navy);
+    color: var(--color-ivory);
+  }
+
+  /* Focus: navy on light surfaces, gold on navy surfaces */
+  :focus-visible {
+    outline: 2px solid var(--color-navy);
+    outline-offset: 3px;
+  }
+  .surface-navy :focus-visible {
+    outline-color: var(--color-gold);
+  }
+}
+
+/* ---------- Hero entrance (CSS, runs on first paint) ---------- */
+@keyframes hero-bg {
+  from {
+    transform: scale(1.05);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+@keyframes hero-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(var(--motion-travel, 12px));
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes hero-rise {
+  from {
+    transform: scaleY(0);
+  }
+  to {
+    transform: scaleY(1);
+  }
+}
+@keyframes hero-draw-x {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+.hero-bg {
+  animation: hero-bg var(--motion-bg) var(--motion-ease) both;
+}
+.hero-line {
+  transform-origin: bottom;
+  animation: hero-rise var(--motion-rise) var(--motion-ease) both;
+  animation-delay: calc(var(--i, 0) * var(--motion-stagger) + 0.1s);
+}
+.hero-rule {
+  animation: hero-draw-x var(--motion-base) var(--motion-ease) both;
+  animation-delay: 0.2s;
+}
+.hero-step {
+  animation: hero-fade-up var(--motion-base) var(--motion-ease) both;
+  animation-delay: calc(var(--i, 0) * 0.12s + 0.3s);
+}
+
+/* ---------- Reduced motion ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .hero-bg,
+  .hero-line,
+  .hero-rule,
+  .hero-step {
+    animation: none !important;
+  }
+  /* Motion-driven reveals render in their final state */
+  [data-motion] {
+    opacity: 1 !important;
+    transform: none !important;
+    clip-path: none !important;
+  }
+  [data-motion] path,
+  path[data-motion] {
+    stroke-dasharray: none !important;
+    stroke-dashoffset: 0 !important;
+    opacity: 1 !important;
+  }
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
