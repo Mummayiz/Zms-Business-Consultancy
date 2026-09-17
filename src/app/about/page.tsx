@@ -25,7 +25,7 @@ export default function AboutPage() {
           <Reveal className="lg:col-span-5">
             <SectionTitle id="who-title" label={about.who.label} title={about.who.title} />
           </Reveal>
-          <Reveal delay={0.1} className="lg:col-span-6 lg:col-start-7 lg:border-l lg:border-navy/12 lg:pt-14 lg:pl-12">
+          <Reveal delay={0.1} className="lg:col-span-6 lg:col-start-7 lg:border-l lg:border-navy/12 lg:pl-12">
             {about.who.paragraphs.map((p) => (
               <p key={p} className="type-lead measure mb-5 last:mb-0">
                 {p}

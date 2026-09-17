@@ -22,7 +22,7 @@ headless Edge, plus manual keyboard, contrast and reflow checks.
 | Issue | Rule | Fix |
 |---|---|---|
 | Contact details list nested `dt`/`dd` inside an extra `div`, so they were not direct children of the list row | `definition-list`, `dlitem` (WCAG 1.3.1) | Restructured each row so `dt` and `dd` are direct children of the wrapping `div`; the icon moved inside the `dt` |
-| Form field, mobile menu button and FAQ toggle borders sat at navy 28% (1.99:1) | WCAG 1.4.11 non-text contrast | Raised to navy 40%, the strongest value the brand rules allow (2.85:1) |
+| Form field, mobile menu button and FAQ toggle borders sat at navy 28% (1.99:1) | WCAG 1.4.11 non-text contrast | Raised to navy 40% (2.85:1), then to navy 55% for fields and secondary buttons (see below) |
 | The disabled WhatsApp button gave no reason for being unavailable | WCAG 1.3.1 | Added screen-reader-only text: "(not available yet)" |
 
 ## Verified manually
@@ -58,13 +58,29 @@ headless Edge, plus manual keyboard, contrast and reflow checks.
 - **Reduced motion.** Hero keyframes, scroll reveals, orbit drawing and bar growth are all disabled;
   content renders in its final state.
 
-## Open item for the client
+## Approved deviation: field and secondary-button borders at navy 55%
 
-Field and secondary-button boundaries are at navy 40%, measuring **2.85:1** and **2.82:1** against
-their adjacent colours. WCAG 1.4.11 asks for 3:1. The brand rules cap these borders at navy 40%, so
-closing the gap needs a decision:
+**Status: resolved. The client approved option 1 on 18 September 2026.**
 
-1. Darken these borders to about navy 55% (≈3.2:1), which goes outside the approved 28–40% range, or
-2. Keep 40% and accept a marginal shortfall on this one criterion.
+The brief specifies "navy at 28–40% for input and secondary-button borders". At the top of that
+range the boundaries measured **2.85:1** (fields, against white) and **2.82:1** (secondary buttons,
+against ivory), below the 3:1 that WCAG 1.4.11 requires for the visual boundary of a UI component.
 
-Marked in the code as `// TODO: review` in `src/components/ui/Field.tsx`.
+Both are now **navy at 55%**, measured in the browser after the change:
+
+| Element | Adjacent colour | Before (navy 40%) | After (navy 55%) |
+|---|---|---|---|
+| Text input, select, textarea | white | 2.85:1 | **4.76:1** |
+| Secondary button | ivory | 2.82:1 | **4.67:1** |
+
+The measured figures beat a plain sRGB calculation (which predicts 3.85:1 and 3.77:1) because
+Tailwind v4 composites opacity in OKLab, producing a slightly darker mix.
+
+**The deviation is limited to these two borders.** Navy 55% is still the approved navy, only at a
+different opacity, so the palette itself is unchanged. Everything else stays inside the brief:
+12% for hairline borders, 16% for borders on navy, 28% for decorative rules, and 40% for the mobile
+menu button and FAQ toggle — both of which are identified by their high-contrast navy glyph rather
+than by the border, so they already satisfy 1.4.11.
+
+Before-and-after screenshots: `docs/images/field-before.png`, `docs/images/field-after.png`,
+`docs/images/button-before.png`, `docs/images/button-after.png`.

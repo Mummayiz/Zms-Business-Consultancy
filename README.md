@@ -160,7 +160,7 @@ list the open items and the changes that were measured and deliberately rejected
       enable them in `src/data/home.ts`
 - [ ] Confirm the response-time wording in the form's success message
 - [ ] Approve the mission, vision and values wording in `src/data/pages.ts`
-- [ ] Decide the form and secondary-button border contrast question in `docs/accessibility-audit.md`
+- [x] Form and secondary-button border contrast — resolved at navy 55%, see `docs/accessibility-audit.md`
 - [ ] Legal review of the Privacy Policy and Terms of Use, then set their "last updated" dates
 - [ ] Final copy review
 - [ ] Final client approval

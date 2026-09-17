@@ -33,21 +33,22 @@ export function ProcessSteps({
       viewport={viewport}
     >
       <div className="relative h-36 border-b border-navy/28 sm:h-44 lg:h-[220px]">
-        <ArchitecturalBars
-          heights={HEIGHTS}
-          accentIndex={HEIGHTS.length - 1}
-          step={RISE_STEP}
-          className="grid h-full grid-cols-4 gap-6 lg:gap-8"
-          barClassName="w-8 sm:w-10 lg:w-12"
-        />
+        {/* Orbit first so the bars paint over it */}
         {orbit && (
           <Orbit
             variant="process"
             controlled
             delay={ORBIT_DELAY}
-            className="pointer-events-none absolute inset-0 h-full w-full overflow-visible"
+            className="pointer-events-none absolute inset-0 z-0 h-full w-full"
           />
         )}
+        <ArchitecturalBars
+          heights={HEIGHTS}
+          accentIndex={HEIGHTS.length - 1}
+          step={RISE_STEP}
+          className="relative z-10 grid h-full grid-cols-4 gap-6 lg:gap-8"
+          barClassName="w-8 sm:w-10 lg:w-12"
+        />
       </div>
 
       <ol className="mt-8 grid gap-x-6 gap-y-8 sm:grid-cols-2 lg:mt-10 lg:grid-cols-4 lg:gap-x-8">

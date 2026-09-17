@@ -70,7 +70,7 @@ export function Hero() {
         </div>
       </div>
 
-      <div className="wrap flex min-h-[calc(100svh-72px)] flex-col items-center justify-center pt-16 pb-32 text-center lg:min-h-[calc(100svh-84px)] lg:pb-40">
+      <div className="wrap flex min-h-[calc(100svh-72px)] flex-col items-center justify-center pt-12 pb-24 text-center lg:min-h-[calc(100svh-84px)] lg:pt-16 lg:pb-40">
         <p className="type-label flex items-center gap-4 text-navy">
           <span className="rule-taper hero-rule origin-right" aria-hidden />
           <span className="hero-step" style={step(0)}>

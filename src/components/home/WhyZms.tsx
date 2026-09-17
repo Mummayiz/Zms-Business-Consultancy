@@ -15,8 +15,13 @@ export function WhyZms() {
         </Reveal>
 
         <RevealGroup as="ul" className="grid gap-x-10 gap-y-10 sm:grid-cols-2 lg:col-span-7 lg:col-start-6 lg:gap-y-14">
+          {/* Bordered cards on small screens (matching About values), gold rules on desktop */}
           {points.map((point) => (
-            <RevealItem as="li" key={point.title} className="border-l-2 border-gold pl-6">
+            <RevealItem
+              as="li"
+              key={point.title}
+              className="rounded-card border border-navy/12 p-6 lg:rounded-none lg:border-0 lg:border-l-2 lg:border-gold lg:p-0 lg:pl-6"
+            >
               <h3 className="font-serif text-[1.625rem] leading-tight font-semibold">{point.title}</h3>
               <p className="mt-3 text-[0.9375rem] leading-relaxed">{point.text}</p>
               {"showLicence" in point && point.showLicence && (

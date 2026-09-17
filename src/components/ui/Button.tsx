@@ -8,7 +8,9 @@ const base =
 
 const variants: Record<ButtonVariant, string> = {
   primary: "border-gold bg-navy text-ivory hover:bg-gold hover:text-navy",
-  secondary: "border-navy/40 bg-transparent text-navy hover:border-gold",
+  // navy/55 (3.77:1 on ivory) meets WCAG 1.4.11; an approved deviation from the
+  // brief's "navy at 40%" for secondary buttons — see docs/accessibility-audit.md.
+  secondary: "border-navy/55 bg-transparent text-navy hover:border-gold",
   onNavy: "border-gold bg-transparent text-ivory hover:bg-gold hover:text-navy",
   secondaryOnNavy: "border-ivory/40 bg-transparent text-ivory hover:border-gold",
 };

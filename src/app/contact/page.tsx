@@ -39,7 +39,8 @@ export default function ContactPage() {
 
       <section aria-labelledby="details-title" className="section-y">
         <div className="wrap grid gap-14 lg:grid-cols-12 lg:gap-8">
-          <Reveal className="lg:col-span-5">
+          {/* Sticky so the shorter details column tracks the tall form */}
+          <Reveal className="lg:col-span-5 lg:sticky lg:top-28 lg:self-start">
             <h2 id="details-title" className="type-section">
               {details.title}
             </h2>

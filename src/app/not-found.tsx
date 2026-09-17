@@ -40,7 +40,11 @@ export default function NotFound() {
               style={{ height: `${h}%`, clipPath: "polygon(0 0, 100% 14px, 100% 100%, 0 100%)" }}
             />
           ))}
-          <span className="block h-full w-10 border border-dashed border-navy/28" />
+          {/* The fourth step: gold, but not yet reached */}
+          <span
+            className="block h-full w-10 bg-gold/40"
+            style={{ clipPath: "polygon(0 0, 100% 14px, 100% 100%, 0 100%)" }}
+          />
         </div>
       </div>
     </section>

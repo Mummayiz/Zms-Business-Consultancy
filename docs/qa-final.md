@@ -89,6 +89,37 @@ mobile profile (4x CPU slowdown, 1.6Mbps) runs alongside the server and browser.
 
 No other defects were found.
 
+## Post-review changes (18 September 2026)
+
+Applied after the client's screenshot review, then re-verified (lint, build, axe, QA sweep, all
+screenshots regenerated):
+
+| # | Change |
+|---|---|
+| 1 | Service columns on Home and `/services` share one top edge; the diagonal stagger is gone |
+| 2 | Privacy and Terms gained a sticky "On this page" index in the right column at `lg` and above |
+| 3 | The 404's fourth bar is a solid gold bar at 40% opacity, with the same slanted top as the others |
+| 4 | PageHeader bars sit fully inside the navy band (height 58%, 40px clear of the bottom edge) |
+| 5 | The process curve runs from the top of bar 01 to bar 04 and renders behind the bars (orbit first in the DOM, bars at `z-10`) |
+| 6 | The hero divider is a shallow symmetric arc, inset 300px each side, fading to transparent at both ends |
+| 7 | Mobile hero padding tightened — see the note below on its height |
+| 8 | WhatsApp placeholder button: unchanged navy primary at 45% opacity — see the note below |
+| 9 | The contact details column is sticky on desktop, so it tracks the tall form instead of leaving dead space |
+| 10 | About "Who we are": removed the right column's top offset so both columns start level |
+| 11 | Home "Why ZMS": bordered cards on small screens, gold rules from `lg` up |
+
+**Two notes on the review list:**
+
+- **Item 7 (mobile hero height).** The hero already fills the viewport below the nav: measured at
+  390×844 it is **772px tall with a 73px nav**, so 845px total. It cannot grow without pushing the
+  page into a scroll on first paint. The composition felt short because the content sat high inside
+  it, so the bottom padding came down from 128px to 96px to centre it better.
+- **Item 8 (WhatsApp button).** No grey exists in the codebase. The button is
+  `background #081F2D`, `border #C89A3D`, `text #FBF6EA` at `opacity: 0.45`, exactly the brief's
+  disabled style. The grey appearance is what navy at 45% opacity looks like blended with the ivory
+  page. To remove that appearance entirely the fill would have to stay at full strength, which is a
+  different treatment — flagged for the client rather than changed unilaterally.
+
 ## Open items carried to launch
 
 These need client or legal decisions and are listed in the README's before-launch checklist:
@@ -97,7 +128,7 @@ These need client or legal decisions and are listed in the README's before-launc
 2. "Clear scope and pricing" and "Direct senior involvement" — held back until confirmed.
 3. Response-time wording in the form's success message.
 4. Privacy and Terms legal review, plus their "last updated" dates.
-5. Form and secondary-button border contrast: 2.85:1 against the 3:1 that WCAG 1.4.11 asks for,
-   because brand rules cap these borders at navy 40%.
+5. ~~Form and secondary-button border contrast~~ — resolved: raised to navy 55%, measuring 4.76:1
+   and 4.67:1. Recorded as an approved deviation in `docs/accessibility-audit.md`.
 6. Mobile performance: accept ~84, or take one of the two structural options in `docs/performance.md`.
 7. Real email, phone, WhatsApp number and domain, then `isPlaceholder: false`.

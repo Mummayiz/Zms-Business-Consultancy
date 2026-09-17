@@ -36,7 +36,8 @@ export function PageHeader({ title, intro, label, labelHref }: PageHeaderProps) 
           {intro && <p className="type-lead measure mt-6 text-ivory">{intro}</p>}
         </div>
 
-        <RevealGroup className="absolute right-8 bottom-0 hidden h-[78%] w-[220px] lg:block xl:w-[260px]">
+        {/* Bars sit fully inside the navy band rather than running off its edge */}
+        <RevealGroup className="absolute right-8 bottom-10 hidden h-[58%] w-[220px] lg:block xl:w-[260px]">
           <ArchitecturalBars
             heights={[38, 58, 80, 100]}
             tone="navy"
