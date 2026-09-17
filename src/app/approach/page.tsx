@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 import { approachPage } from "@/data/approach";
 import { cta } from "@/data/home";
 import { PageHeader } from "@/components/layout/PageHeader";
@@ -8,10 +8,11 @@ import { ProcessSteps } from "@/components/services/ProcessSteps";
 import { StageBar } from "@/components/services/StageBar";
 import { Reveal } from "@/components/motion/Reveal";
 
-export const metadata: Metadata = {
+export const metadata = pageMetadata({
   title: approachPage.metaTitle,
   description: approachPage.metaDescription,
-};
+  path: "/approach",
+});
 
 export default function ApproachPage() {
   const { overview, stages } = approachPage;

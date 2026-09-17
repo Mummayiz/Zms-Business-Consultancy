@@ -4,6 +4,8 @@ import { site } from "@/config/site";
 import { Nav } from "@/components/layout/Nav";
 import { Footer } from "@/components/layout/Footer";
 import { MotionProvider } from "@/components/motion/MotionProvider";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { organisationJsonLd, robotsMeta } from "@/lib/seo";
 import "./globals.css";
 
 const cormorant = Cormorant_Garamond({
@@ -20,16 +22,20 @@ const montserrat = Montserrat({
   display: "swap",
 });
 
-// Full per-page SEO (canonical, Open Graph, JSON-LD) arrives in Phase 5.
+// Site-wide defaults. Each page adds its own title, description, canonical and Open Graph via pageMetadata().
 export const metadata: Metadata = {
   metadataBase: new URL(site.url),
+  applicationName: site.name,
   title: {
     default: `${site.name} | Abu Dhabi`,
     template: `%s | ${site.name}`,
   },
   description:
     "Business management consultancy in Abu Dhabi: administrative consultancy, marketing consultancy and project management services for organisations across the UAE.",
-  robots: site.isPlaceholder ? { index: false, follow: false } : undefined,
+  openGraph: { type: "website", siteName: site.name, locale: "en_AE" },
+  twitter: { card: "summary_large_image" },
+  formatDetection: { telephone: false, email: false, address: false },
+  robots: robotsMeta(),
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
@@ -41,6 +47,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         </noscript>
       </head>
       <body className="flex min-h-svh flex-col">
+        <JsonLd data={organisationJsonLd()} />
         <a
           href="#main"
           className="sr-only z-[60] rounded-ui bg-navy px-4 py-3 text-sm font-semibold text-ivory focus:not-sr-only focus:fixed focus:top-3 focus:left-3"

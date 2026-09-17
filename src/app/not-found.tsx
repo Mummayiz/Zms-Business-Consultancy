@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import { notFound } from "@/data/pages";
+import { robotsMeta } from "@/lib/seo";
 import { ButtonLink } from "@/components/ui/Button";
 
 export const metadata: Metadata = {
   title: notFound.title,
-  robots: { index: false, follow: false },
+  robots: robotsMeta(true),
 };
 
 export default function NotFound() {

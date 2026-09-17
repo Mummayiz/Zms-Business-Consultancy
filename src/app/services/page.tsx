@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 import { servicesOverview } from "@/data/pages";
 import { cta } from "@/data/home";
 import { PageHeader } from "@/components/layout/PageHeader";
@@ -8,10 +8,11 @@ import { TextLink } from "@/components/ui/TextLink";
 import { ServicesGrid } from "@/components/services/ServicesGrid";
 import { Reveal } from "@/components/motion/Reveal";
 
-export const metadata: Metadata = {
+export const metadata = pageMetadata({
   title: servicesOverview.metaTitle,
   description: servicesOverview.metaDescription,
-};
+  path: "/services",
+});
 
 export default function ServicesPage() {
   const { together } = servicesOverview;

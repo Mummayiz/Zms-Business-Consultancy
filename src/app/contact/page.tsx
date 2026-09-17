@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 import { Mail, MapPin, MessageCircle, Phone } from "lucide-react";
 import type { ReactNode } from "react";
 import { contact } from "@/data/pages";
@@ -8,10 +8,11 @@ import { buttonClasses } from "@/components/ui/Button";
 import { ContactForm } from "@/components/contact/ContactForm";
 import { Reveal } from "@/components/motion/Reveal";
 
-export const metadata: Metadata = {
+export const metadata = pageMetadata({
   title: contact.metaTitle,
   description: contact.metaDescription,
-};
+  path: "/contact",
+});
 
 function DetailRow({ icon, label, children }: { icon: ReactNode; label: string; children: ReactNode }) {
   return (

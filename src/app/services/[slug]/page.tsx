@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { getService, services } from "@/data/services";
+import { getService, serviceHref, services } from "@/data/services";
+import { pageMetadata } from "@/lib/seo";
 import { cta } from "@/data/home";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { CtaBand } from "@/components/layout/CtaBand";
@@ -21,7 +22,11 @@ export async function generateMetadata({ params }: PageProps<"/services/[slug]">
   const { slug } = await params;
   const service = getService(slug);
   if (!service) return {};
-  return { title: service.title, description: service.metaDescription };
+  return pageMetadata({
+    title: service.title,
+    description: service.metaDescription,
+    path: serviceHref(service.slug),
+  });
 }
 
 export default async function ServicePage({ params }: PageProps<"/services/[slug]">) {

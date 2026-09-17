@@ -48,3 +48,6 @@ next-env.d.ts
 
 # local agent skills (kept untouched, not versioned)
 .agents/
+
+# local review screenshots
+review-shots/

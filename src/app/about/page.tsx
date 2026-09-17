@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 import { about } from "@/data/pages";
 import { cta } from "@/data/home";
 import { licenceFull, site } from "@/config/site";
@@ -8,10 +8,11 @@ import { SectionTitle } from "@/components/ui/SectionTitle";
 import { Card } from "@/components/ui/Card";
 import { Reveal, RevealGroup, RevealItem } from "@/components/motion/Reveal";
 
-export const metadata: Metadata = {
+export const metadata = pageMetadata({
   title: about.metaTitle,
   description: about.metaDescription,
-};
+  path: "/about",
+});
 
 export default function AboutPage() {
   return (
