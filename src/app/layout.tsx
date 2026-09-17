@@ -11,14 +11,16 @@ import "./globals.css";
 const cormorant = Cormorant_Garamond({
   variable: "--font-cormorant",
   subsets: ["latin"],
-  weight: ["500", "600"],
+  // Only 600 is used, so 500 is not downloaded.
+  weight: ["600"],
   display: "swap",
 });
 
 const montserrat = Montserrat({
   variable: "--font-montserrat",
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+  // 700 is unused; each extra weight is another font file to download.
+  weight: ["400", "500", "600"],
   display: "swap",
 });
 

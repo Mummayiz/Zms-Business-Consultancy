@@ -32,7 +32,7 @@ export function ServiceCard({ service, linkLabel = "Explore the service", classN
       <div className="flex items-start justify-between gap-6">
         <span
           aria-hidden
-          className="font-serif text-5xl leading-none font-medium text-navy lining-nums transition-transform duration-300 ease-zms group-hover:-translate-y-1"
+          className="font-serif text-5xl leading-none font-semibold text-navy lining-nums transition-transform duration-300 ease-zms group-hover:-translate-y-1"
         >
           {service.number}
         </span>

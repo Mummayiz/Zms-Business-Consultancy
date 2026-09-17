@@ -8,17 +8,16 @@ import { site } from "@/config/site";
 import { Field } from "@/components/ui/Field";
 import { Button } from "@/components/ui/Button";
 import {
+  FIELD_ORDER,
   MESSAGE_MIN,
   emptyEnquiry,
   validateEnquiry,
   type EnquiryField,
   type EnquiryValues,
   type FieldErrors,
-} from "@/lib/validation";
+} from "@/lib/enquiry";
 
 type Status = "idle" | "sending" | "success" | "notConnected" | "failed";
-
-const FIELD_ORDER: EnquiryField[] = ["name", "company", "email", "phone", "service", "message"];
 
 export function ContactForm() {
   const [values, setValues] = useState<EnquiryValues>(emptyEnquiry);

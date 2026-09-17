@@ -1,5 +1,5 @@
 import { Resend } from "resend";
-import type { Enquiry } from "@/lib/validation";
+import type { Enquiry } from "@/lib/enquiry-schema";
 import { site } from "@/config/site";
 
 type EmailConfig = { apiKey: string; to: string; from: string };

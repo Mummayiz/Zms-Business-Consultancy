@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "motion/react";
+import { m } from "motion/react";
 import { architecturalRise } from "@/lib/motion";
 
 type ArchitecturalBarsProps = {
@@ -33,7 +33,7 @@ export function ArchitecturalBars({
     <div className={className} aria-hidden>
       {heights.map((h, i) => (
         <div key={i} className="flex h-full items-end">
-          <motion.div
+          <m.div
             variants={architecturalRise}
             custom={i * step}
             data-motion
@@ -45,7 +45,7 @@ export function ArchitecturalBars({
               className={`h-full w-full [--slant:9px] lg:[--slant:16px] ${i === accentIndex ? "bg-gold" : baseColour}`}
               style={{ clipPath: "polygon(0 0, 100% var(--slant), 100% 100%, 0 100%)" }}
             />
-          </motion.div>
+          </m.div>
         </div>
       ))}
     </div>

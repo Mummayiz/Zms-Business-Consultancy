@@ -1,5 +1,8 @@
 import Image from "next/image";
 import type { CSSProperties } from "react";
+// Imported as a module so Next knows the intrinsic size (no upscaling) and can
+// generate a blur placeholder.
+import heroBackground from "../../../public/brand/zms-hero-background.jpg";
 import { hero } from "@/data/home";
 import { heroMotionVars } from "@/lib/motion";
 import { ButtonLink } from "@/components/ui/Button";
@@ -30,11 +33,19 @@ export function Hero() {
       <div className="absolute inset-0 -z-10 overflow-hidden">
         <div className="hero-bg absolute inset-0">
           <Image
-            src="/brand/zms-hero-background.jpg"
+            src={heroBackground}
             alt=""
             fill
             preload
-            sizes="100vw"
+            fetchPriority="high"
+            /*
+             * This is a soft background behind an ivory glow, so it tolerates a
+             * lower resolution and quality. Phones ask for ~75vw (about 640px at
+             * DPR 2) instead of the full 1254px source, which is the difference
+             * between an 83KB and a ~20KB LCP image on a slow connection.
+             */
+            sizes="(max-width: 640px) 75vw, 100vw"
+            quality={60}
             className="object-cover object-[74%_40%] md:object-[center_40%]"
           />
         </div>

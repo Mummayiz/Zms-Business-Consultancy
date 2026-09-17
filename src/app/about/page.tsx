@@ -48,7 +48,7 @@ export default function AboutPage() {
                 {block.label}
                 <span className="rule-taper" aria-hidden />
               </h2>
-              <p className="mt-6 font-serif text-[clamp(1.625rem,1.3rem+1vw,2.25rem)] leading-snug font-medium text-navy">
+              <p className="mt-6 font-serif text-[clamp(1.625rem,1.3rem+1vw,2.25rem)] leading-snug font-semibold text-navy">
                 {block.text}
               </p>
             </Reveal>

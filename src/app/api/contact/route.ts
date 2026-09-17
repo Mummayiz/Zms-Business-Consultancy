@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { enquirySchema, toFieldErrors } from "@/lib/validation";
+import { enquirySchema, toFieldErrors } from "@/lib/enquiry-schema";
+import { isHoneypotFilled } from "@/lib/enquiry";
 import { getEmailConfig, sendEnquiry } from "@/lib/email";
 import { contact } from "@/data/pages";
 
@@ -21,14 +22,7 @@ export async function POST(request: Request) {
   }
 
   // Honeypot: silently accept and discard anything that filled the hidden field.
-  if (
-    typeof body === "object" &&
-    body !== null &&
-    typeof (body as { website?: unknown }).website === "string" &&
-    (body as { website: string }).website.trim() !== ""
-  ) {
-    return json({ ok: true });
-  }
+  if (isHoneypotFilled(body)) return json({ ok: true });
 
   const parsed = enquirySchema.safeParse(body);
   if (!parsed.success) {

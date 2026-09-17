@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, type Variants } from "motion/react";
+import { m, type Variants } from "motion/react";
 import type { ReactNode } from "react";
 import { fadeUp, reveal, scaleIn, staggerChildren, viewport } from "@/lib/motion";
 
@@ -16,7 +16,7 @@ type RevealProps = {
 
 /** Reveals its content once when it scrolls into view. */
 export function Reveal({ children, variant = "fadeUp", delay = 0, className, as = "div" }: RevealProps) {
-  const Tag = motion[as];
+  const Tag = m[as];
   return (
     <Tag
       className={className}
@@ -41,7 +41,7 @@ type StaggerProps = {
 
 /** Parent that staggers `RevealItem` children as the group enters view. */
 export function RevealGroup({ children, delay = 0, className, as = "div" }: StaggerProps) {
-  const Tag = motion[as];
+  const Tag = m[as];
   return (
     <Tag
       className={className}
@@ -64,7 +64,7 @@ export function RevealItem({
   className?: string;
   as?: "div" | "li";
 }) {
-  const Tag = motion[as];
+  const Tag = m[as];
   return (
     <Tag className={className} variants={fadeUp} data-motion>
       {children}

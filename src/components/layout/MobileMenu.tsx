@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { AnimatePresence, motion } from "motion/react";
+import { AnimatePresence, m } from "motion/react";
 import { Menu, X } from "lucide-react";
 import { primaryCta, primaryNav } from "@/data/navigation";
 import { site } from "@/config/site";
@@ -80,7 +80,7 @@ export function MobileMenu({ pathname }: { pathname: string }) {
 
       <AnimatePresence>
         {open && (
-          <motion.div
+          <m.div
             ref={panelRef}
             id="mobile-menu"
             role="dialog"
@@ -161,7 +161,7 @@ export function MobileMenu({ pathname }: { pathname: string }) {
                 <p className="mt-6 type-label text-gold">Abu Dhabi</p>
               </div>
             </nav>
-          </motion.div>
+          </m.div>
         )}
       </AnimatePresence>
     </div>

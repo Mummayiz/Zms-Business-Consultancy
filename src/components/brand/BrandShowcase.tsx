@@ -1,4 +1,7 @@
 import Image from "next/image";
+// Imported as a module so Next knows the intrinsic size and can generate a
+// blur placeholder; the 2.1MB PNG is served as a much smaller AVIF/WebP.
+import conceptArtwork from "../../../public/brand/zms-logo-concept-original.png";
 import { Reveal } from "@/components/motion/Reveal";
 
 /**
@@ -13,10 +16,9 @@ export function BrandShowcase({ alt, className = "" }: { alt: string; className?
         <div className="overflow-hidden rounded-[6px]">
           <Reveal variant="scaleIn">
             <Image
-              src="/brand/zms-logo-concept-original.png"
+              src={conceptArtwork}
               alt={alt}
-              width={1254}
-              height={1254}
+              placeholder="blur"
               sizes="(min-width: 1280px) 600px, (min-width: 1024px) 48vw, calc(100vw - 48px)"
               className="block h-auto w-full"
             />

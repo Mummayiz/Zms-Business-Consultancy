@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "motion/react";
+import { m } from "motion/react";
 import { lineDraw, viewport } from "@/lib/motion";
 
 /*
@@ -31,7 +31,7 @@ export function Orbit({ variant, className, delay = 0, controlled = false }: Orb
   const trigger = controlled ? {} : { initial: "hidden", whileInView: "visible", viewport };
 
   return (
-    <motion.svg
+    <m.svg
       viewBox={viewBox}
       preserveAspectRatio="none"
       aria-hidden
@@ -39,7 +39,7 @@ export function Orbit({ variant, className, delay = 0, controlled = false }: Orb
       className={className}
       {...trigger}
     >
-      <motion.path
+      <m.path
         d={d}
         fill="none"
         stroke="var(--color-gold)"
@@ -49,6 +49,6 @@ export function Orbit({ variant, className, delay = 0, controlled = false }: Orb
         custom={delay}
         data-motion
       />
-    </motion.svg>
+    </m.svg>
   );
 }

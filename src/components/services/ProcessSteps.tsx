@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "motion/react";
+import { m } from "motion/react";
 import { fadeUp, staggerChildren, viewport } from "@/lib/motion";
 import { ArchitecturalBars } from "@/components/brand/ArchitecturalBars";
 import { Orbit } from "@/components/brand/Orbit";
@@ -26,7 +26,7 @@ export function ProcessSteps({
   orbit?: boolean;
 }) {
   return (
-    <motion.div
+    <m.div
       variants={staggerChildren(0, 0)}
       initial="hidden"
       whileInView="visible"
@@ -52,7 +52,7 @@ export function ProcessSteps({
 
       <ol className="mt-8 grid gap-x-6 gap-y-8 sm:grid-cols-2 lg:mt-10 lg:grid-cols-4 lg:gap-x-8">
         {steps.map((step, i) => (
-          <motion.li
+          <m.li
             key={step.title}
             variants={fadeUp}
             custom={(orbit ? TEXT_DELAY : ORBIT_DELAY) + i * 0.1}
@@ -61,9 +61,9 @@ export function ProcessSteps({
             <span className="type-label text-charcoal">{String(i + 1).padStart(2, "0")}</span>
             <h3 className="type-card mt-3">{step.title}</h3>
             <p className="mt-3 text-[0.9375rem] leading-relaxed">{step.text}</p>
-          </motion.li>
+          </m.li>
         ))}
       </ol>
-    </motion.div>
+    </m.div>
   );
 }
