@@ -17,7 +17,14 @@ const TEXT_DELAY = ORBIT_DELAY + 0.35;
  * Four rising architectural bars (last in gold) connected by the orbit,
  * followed by the stage descriptions. Not a horizontal timeline.
  */
-export function ProcessSteps({ steps }: { steps: ProcessStep[] }) {
+export function ProcessSteps({
+  steps,
+  orbit = true,
+}: {
+  steps: ProcessStep[];
+  /** The orbit is approved only for Home "How we work" and /approach. */
+  orbit?: boolean;
+}) {
   return (
     <motion.div
       variants={staggerChildren(0, 0)}
@@ -33,17 +40,24 @@ export function ProcessSteps({ steps }: { steps: ProcessStep[] }) {
           className="grid h-full grid-cols-4 gap-6 lg:gap-8"
           barClassName="w-8 sm:w-10 lg:w-12"
         />
-        <Orbit
-          variant="process"
-          controlled
-          delay={ORBIT_DELAY}
-          className="pointer-events-none absolute inset-0 h-full w-full overflow-visible"
-        />
+        {orbit && (
+          <Orbit
+            variant="process"
+            controlled
+            delay={ORBIT_DELAY}
+            className="pointer-events-none absolute inset-0 h-full w-full overflow-visible"
+          />
+        )}
       </div>
 
       <ol className="mt-8 grid gap-x-6 gap-y-8 sm:grid-cols-2 lg:mt-10 lg:grid-cols-4 lg:gap-x-8">
         {steps.map((step, i) => (
-          <motion.li key={step.title} variants={fadeUp} custom={TEXT_DELAY + i * 0.1} data-motion>
+          <motion.li
+            key={step.title}
+            variants={fadeUp}
+            custom={(orbit ? TEXT_DELAY : ORBIT_DELAY) + i * 0.1}
+            data-motion
+          >
             <span className="type-label text-charcoal">{String(i + 1).padStart(2, "0")}</span>
             <h3 className="type-card mt-3">{step.title}</h3>
             <p className="mt-3 text-[0.9375rem] leading-relaxed">{step.text}</p>

@@ -12,6 +12,8 @@ type ArchitecturalBarsProps = {
   step?: number;
   className?: string;
   barClassName?: string;
+  /** "light" = navy bars for ivory surfaces; "navy" = low-contrast ivory bars on navy. */
+  tone?: "light" | "navy";
 };
 
 /**
@@ -24,7 +26,9 @@ export function ArchitecturalBars({
   step = 0.14,
   className = "",
   barClassName = "",
+  tone = "light",
 }: ArchitecturalBarsProps) {
+  const baseColour = tone === "navy" ? "bg-ivory/16" : "bg-navy";
   return (
     <div className={className} aria-hidden>
       {heights.map((h, i) => (
@@ -38,7 +42,7 @@ export function ArchitecturalBars({
           >
             {/* Slanted top lives on an inner element so motion overrides never remove it */}
             <div
-              className={`h-full w-full [--slant:9px] lg:[--slant:16px] ${i === accentIndex ? "bg-gold" : "bg-navy"}`}
+              className={`h-full w-full [--slant:9px] lg:[--slant:16px] ${i === accentIndex ? "bg-gold" : baseColour}`}
               style={{ clipPath: "polygon(0 0, 100% var(--slant), 100% 100%, 0 100%)" }}
             />
           </motion.div>
