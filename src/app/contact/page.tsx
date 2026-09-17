@@ -14,14 +14,15 @@ export const metadata = pageMetadata({
   path: "/contact",
 });
 
+// dt and dd stay direct children of the wrapping div, as the HTML spec requires.
 function DetailRow({ icon, label, children }: { icon: ReactNode; label: string; children: ReactNode }) {
   return (
-    <div className="flex items-start gap-4 border-b border-navy/12 py-5">
-      <span className="mt-0.5 text-gold">{icon}</span>
-      <div>
-        <dt className="type-label text-charcoal">{label}</dt>
-        <dd className="mt-1.5 font-medium text-navy">{children}</dd>
-      </div>
+    <div className="border-b border-navy/12 py-5">
+      <dt className="type-label flex items-center gap-3 text-charcoal">
+        <span className="text-gold">{icon}</span>
+        {label}
+      </dt>
+      <dd className="mt-2 pl-8 font-medium text-navy">{children}</dd>
     </div>
   );
 }
@@ -63,6 +64,7 @@ export default function ContactPage() {
               <span aria-disabled="true" className={buttonClasses("primary", "mt-8 cursor-not-allowed opacity-45")}>
                 <MessageCircle aria-hidden strokeWidth={1.5} className="h-4 w-4" />
                 {details.whatsappLabel}
+                <span className="sr-only"> (not available yet)</span>
               </span>
             ) : (
               <a href={whatsappHref} target="_blank" rel="noopener noreferrer" className={buttonClasses("primary", "mt-8")}>

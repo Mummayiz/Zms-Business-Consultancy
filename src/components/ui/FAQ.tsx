@@ -11,7 +11,7 @@ export function FAQ({ items }: { items: Faq[] }) {
             <span className="font-serif text-[1.375rem] leading-snug font-semibold text-navy lg:text-2xl">
               {item.question}
             </span>
-            <span className="mt-1 inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-ui border border-navy/28 text-navy transition-colors duration-200 group-open:border-gold">
+            <span className="mt-1 inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-ui border border-navy/40 text-navy transition-colors duration-200 group-open:border-gold">
               <Plus
                 aria-hidden
                 strokeWidth={1.5}

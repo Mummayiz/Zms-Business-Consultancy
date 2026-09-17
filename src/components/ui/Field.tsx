@@ -30,9 +30,15 @@ export function Field({ id, label, optional, error, hint, className = "", childr
   const hintId = hint ? `${id}-hint` : undefined;
   const errorId = error ? `${id}-error` : undefined;
   const describedBy = [hintId, errorId].filter(Boolean).join(" ") || undefined;
+  /*
+   * Field boundaries use navy at 40%, the strongest value the brand rules allow
+   * (28–40%). That measures ~2.8:1 against white.
+   * TODO: review — WCAG 1.4.11 asks for 3:1 on UI boundaries, so this needs
+   * either navy at about 55% or client sign-off to stay at 40%.
+   */
   const border = error
     ? "border-2 border-navy px-[15px] py-[11px]"
-    : "border border-navy/28 px-4 py-3 hover:border-navy/40";
+    : "border border-navy/40 px-4 py-3";
 
   return (
     <div className={`flex flex-col gap-2 ${className}`}>

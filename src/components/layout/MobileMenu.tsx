@@ -73,7 +73,7 @@ export function MobileMenu({ pathname }: { pathname: string }) {
         aria-controls="mobile-menu"
         aria-label="Open menu"
         onClick={() => setOpen(true)}
-        className="inline-flex h-11 w-11 items-center justify-center rounded-ui border border-navy/28 text-navy"
+        className="inline-flex h-11 w-11 items-center justify-center rounded-ui border border-navy/40 text-navy"
       >
         <Menu aria-hidden strokeWidth={1.5} className="h-5 w-5" />
       </button>
