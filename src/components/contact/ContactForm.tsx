@@ -45,7 +45,10 @@ export function ContactForm() {
 
   const focusFirstError = (errs: FieldErrors) => {
     const first = FIELD_ORDER.find((f) => errs[f]);
-    if (first) formRef.current?.querySelector<HTMLElement>(`#enquiry-${first}`)?.focus();
+    if (!first) return;
+    // Bring the summary notice into view too, then move focus to the first invalid field.
+    formRef.current?.scrollIntoView({ block: "start" });
+    formRef.current?.querySelector<HTMLElement>(`#enquiry-${first}`)?.focus({ preventScroll: true });
   };
 
   async function onSubmit(e: FormEvent<HTMLFormElement>) {

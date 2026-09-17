@@ -94,6 +94,11 @@
 @layer base {
   html {
     -webkit-text-size-adjust: 100%;
+    /* Keep focused/anchored content clear of the sticky navigation */
+    scroll-padding-top: 96px;
+    @media (width >= 64rem) {
+      scroll-padding-top: 116px;
+    }
   }
   body {
     background: var(--color-ivory);
