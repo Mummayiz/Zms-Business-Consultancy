@@ -101,7 +101,17 @@ function ServicesDropdown({
   const menuId = useId();
   const wrapperRef = useRef<HTMLDivElement>(null);
   const toggleRef = useRef<HTMLButtonElement>(null);
+  const canHover = useRef(false);
   const active = isActive(pathname, href);
+
+  /*
+   * Open on hover only on devices that really hover. On a touch screen a tap
+   * fires mouseenter and click together, which would open and immediately
+   * close the menu — so touch users get click-to-open instead.
+   */
+  useEffect(() => {
+    canHover.current = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+  }, []);
 
   useEffect(() => {
     if (!open) return;
@@ -126,8 +136,8 @@ function ServicesDropdown({
     <div
       ref={wrapperRef}
       className="relative flex items-center"
-      onMouseEnter={() => setOpen(true)}
-      onMouseLeave={() => setOpen(false)}
+      onMouseEnter={() => canHover.current && setOpen(true)}
+      onMouseLeave={() => canHover.current && setOpen(false)}
       onBlur={(e) => {
         if (!e.currentTarget.contains(e.relatedTarget as Node)) setOpen(false);
       }}
