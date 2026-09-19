@@ -3,8 +3,9 @@ import type { ComponentProps, ReactNode } from "react";
 
 export type ButtonVariant = "primary" | "secondary" | "onNavy" | "secondaryOnNavy";
 
+// `btn-sheen` adds the single gold sweep on hover (see globals.css).
 const base =
-  "inline-flex min-h-12 items-center justify-center gap-2.5 rounded-ui border px-6 py-3.5 text-center text-[0.90625rem] leading-none font-semibold tracking-[0.02em] transition-colors duration-200 ease-zms disabled:pointer-events-none disabled:opacity-45";
+  "btn-sheen relative isolate overflow-hidden inline-flex min-h-12 items-center justify-center gap-2.5 rounded-ui border px-6 py-3.5 text-center text-[0.90625rem] leading-none font-semibold tracking-[0.02em] transition-colors duration-200 ease-zms disabled:pointer-events-none disabled:opacity-45";
 
 const variants: Record<ButtonVariant, string> = {
   primary: "border-gold bg-navy text-ivory hover:bg-gold hover:text-navy",

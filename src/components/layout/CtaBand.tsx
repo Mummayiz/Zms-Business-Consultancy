@@ -1,4 +1,6 @@
 import { ButtonLink } from "@/components/ui/Button";
+import { Grain } from "@/components/ui/Grain";
+import { PointerLight } from "@/components/ui/PointerLight";
 import { Reveal } from "@/components/motion/Reveal";
 
 type CtaBandProps = {
@@ -9,8 +11,10 @@ type CtaBandProps = {
 
 export function CtaBand({ title, text, action }: CtaBandProps) {
   return (
-    <section aria-labelledby="cta-title" className="surface-navy bg-navy text-ivory">
-      <div className="wrap py-16 lg:py-24">
+    <section aria-labelledby="cta-title" className="surface-navy relative overflow-hidden bg-navy text-ivory">
+      <PointerLight />
+      <Grain />
+      <div className="wrap relative py-16 lg:py-24">
         <Reveal className="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between lg:gap-16">
           <div>
             <span className="rule-taper mb-6 w-16" aria-hidden />

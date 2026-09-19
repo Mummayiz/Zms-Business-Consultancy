@@ -185,13 +185,52 @@
   animation-delay: calc(var(--i, 0) * 0.12s + 0.3s);
 }
 
+/* ---------- Depth layer ---------- */
+/* A very slow drift, so the bars breathe rather than animate. */
+@keyframes depth-drift {
+  0% {
+    transform: translate3d(0, 0, var(--depth-z, 0)) rotate(0deg);
+  }
+  50% {
+    transform: translate3d(0, -14px, var(--depth-z, 0)) rotate(0.35deg);
+  }
+  100% {
+    transform: translate3d(0, 0, var(--depth-z, 0)) rotate(0deg);
+  }
+}
+.depth-bar {
+  animation: depth-drift 42s var(--motion-ease, ease-in-out) infinite;
+  will-change: transform;
+}
+
+/* ---------- Button sheen ---------- */
+@media (hover: hover) and (pointer: fine) {
+  .btn-sheen::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    transform: translateX(-120%) skewX(-12deg);
+    background: linear-gradient(90deg, transparent, rgb(200 154 61 / 0.35), transparent);
+    transition: transform 0.55s var(--ease-zms);
+  }
+  .btn-sheen:hover::after {
+    transform: translateX(120%) skewX(-12deg);
+  }
+}
+
 /* ---------- Reduced motion ---------- */
 @media (prefers-reduced-motion: reduce) {
   .hero-bg,
   .hero-line,
   .hero-rule,
-  .hero-step {
+  .hero-step,
+  .depth-bar {
     animation: none !important;
+  }
+  /* No pointer sheen and no button sweep */
+  .btn-sheen::after {
+    display: none !important;
   }
   /* Motion-driven reveals render in their final state */
   [data-motion] {

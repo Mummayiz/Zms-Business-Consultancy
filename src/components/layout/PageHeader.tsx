@@ -1,6 +1,8 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { ArchitecturalBars } from "@/components/brand/ArchitecturalBars";
+import { Grain } from "@/components/ui/Grain";
+import { PointerLight } from "@/components/ui/PointerLight";
 import { RevealGroup } from "@/components/motion/Reveal";
 
 type PageHeaderProps = {
@@ -18,6 +20,8 @@ type PageHeaderProps = {
 export function PageHeader({ title, intro, label, labelHref }: PageHeaderProps) {
   return (
     <header className="surface-navy relative overflow-hidden bg-navy text-ivory">
+      <PointerLight />
+      <Grain />
       <div className="wrap relative grid gap-10 pt-16 pb-16 lg:grid-cols-12 lg:gap-8 lg:pt-24 lg:pb-24">
         <div className="lg:col-span-8">
           {label && (

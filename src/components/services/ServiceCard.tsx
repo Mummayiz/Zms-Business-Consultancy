@@ -24,10 +24,16 @@ export function ServiceCard({ service, linkLabel = "Explore the service", classN
   const Icon = icons[service.icon];
 
   return (
-    <article className={`group relative flex h-full flex-col border-t border-navy/12 pt-8 ${className}`}>
+    <article className={`group relative flex h-full flex-col pt-8 ${className}`}>
+      {/* Top rule: full width by default, extended by the scroll scene through --rule-scale */}
       <span
         aria-hidden
-        className="absolute -top-px left-0 h-0.5 w-full origin-left scale-x-0 bg-gold transition-transform duration-300 ease-zms group-hover:scale-x-100 group-focus-within:scale-x-100"
+        className="absolute inset-x-0 top-0 h-px origin-left bg-navy/12"
+        style={{ transform: "scaleX(var(--rule-scale, 1))" }}
+      />
+      <span
+        aria-hidden
+        className="absolute top-0 left-0 h-0.5 w-full origin-left scale-x-0 bg-gold transition-transform duration-300 ease-zms group-hover:scale-x-100 group-focus-within:scale-x-100"
       />
       <div className="flex items-start justify-between gap-6">
         <span

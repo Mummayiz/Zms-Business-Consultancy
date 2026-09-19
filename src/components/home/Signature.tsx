@@ -1,7 +1,9 @@
 import { signature } from "@/data/home";
 import { BrandShowcase } from "@/components/brand/BrandShowcase";
-import { Orbit } from "@/components/brand/Orbit";
+import { Grain } from "@/components/ui/Grain";
+import { PointerLight } from "@/components/ui/PointerLight";
 import { Reveal, RevealGroup, RevealItem } from "@/components/motion/Reveal";
+import { SignatureScene } from "./SignatureScene";
 
 type Glyph = (typeof signature.pillars)[number]["glyph"];
 
@@ -31,47 +33,54 @@ function PillarGlyph({ glyph }: { glyph: Glyph }) {
 
 export function Signature() {
   return (
-    <section aria-labelledby="signature-title" className="surface-navy section-y overflow-hidden bg-navy text-ivory">
-      <div className="wrap grid items-center gap-14 lg:grid-cols-12 lg:gap-8">
-        <BrandShowcase alt={signature.showcaseAlt} className="lg:col-span-6" />
+    <section
+      aria-labelledby="signature-title"
+      className="surface-navy section-y relative overflow-hidden bg-navy text-ivory"
+    >
+      <PointerLight />
+      <Grain />
 
-        <div className="lg:col-span-5 lg:col-start-8">
+      <SignatureScene
+        image={<BrandShowcase alt={signature.showcaseAlt} />}
+        orbitClassName="mt-4 h-[72px] w-full lg:-ml-16 lg:h-[110px] lg:w-[calc(100%+4rem)]"
+        textTop={
           <Reveal>
-            <p className="type-label flex items-center gap-4 text-gold">
-              {signature.label}
-              <span className="rule-taper" aria-hidden />
-            </p>
-            <h2
-              id="signature-title"
-              className="mt-6 font-serif text-[clamp(3rem,2.2rem+3vw,4.5rem)] leading-[1.02] font-semibold text-ivory"
-            >
-              {signature.title.map((word) => (
-                <span key={word} className="block">
-                  {word}
-                </span>
-              ))}
+              <p className="type-label flex items-center gap-4 text-gold">
+                {signature.label}
+                <span className="rule-taper" aria-hidden />
+              </p>
+              <h2
+                id="signature-title"
+                className="mt-6 font-serif text-[clamp(3rem,2.2rem+3vw,4.5rem)] leading-[1.02] font-semibold text-ivory"
+              >
+                {signature.title.map((word) => (
+                  <span key={word} className="block">
+                    {word}
+                  </span>
+                ))}
             </h2>
           </Reveal>
+        }
+        textBottom={
+          <>
+            <Reveal delay={0.2}>
+              <p className="type-lead measure mt-4 text-ivory">{signature.intro}</p>
+            </Reveal>
 
-          <Orbit variant="signature" delay={0.3} className="mt-4 h-[72px] w-full lg:-ml-16 lg:h-[110px] lg:w-[calc(100%+4rem)]" />
-
-          <Reveal delay={0.2}>
-            <p className="type-lead measure mt-4 text-ivory">{signature.intro}</p>
-          </Reveal>
-
-          <RevealGroup as="ul" delay={0.3} className="mt-10 border-t border-ivory/16">
-            {signature.pillars.map((pillar) => (
-              <RevealItem as="li" key={pillar.title} className="flex gap-5 border-b border-ivory/16 py-6">
-                <PillarGlyph glyph={pillar.glyph} />
-                <div>
-                  <h3 className="font-serif text-2xl leading-tight font-semibold text-ivory">{pillar.title}</h3>
-                  <p className="mt-2 text-[0.9375rem] leading-relaxed text-ivory">{pillar.text}</p>
-                </div>
-              </RevealItem>
-            ))}
-          </RevealGroup>
-        </div>
-      </div>
+            <RevealGroup as="ul" delay={0.3} className="mt-10 border-t border-ivory/16">
+              {signature.pillars.map((pillar) => (
+                <RevealItem as="li" key={pillar.title} className="flex gap-5 border-b border-ivory/16 py-6">
+                  <PillarGlyph glyph={pillar.glyph} />
+                  <div>
+                    <h3 className="font-serif text-2xl leading-tight font-semibold text-ivory">{pillar.title}</h3>
+                    <p className="mt-2 text-[0.9375rem] leading-relaxed text-ivory">{pillar.text}</p>
+                  </div>
+                </RevealItem>
+              ))}
+            </RevealGroup>
+          </>
+        }
+      />
     </section>
   );
 }
