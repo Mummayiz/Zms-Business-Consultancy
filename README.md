@@ -55,6 +55,7 @@ Copy `.env.example` to `.env.local` and fill in the values:
 
 | Variable | Purpose |
 |---|---|
+| `NEXT_PUBLIC_SITE_URL` | Public origin of this deployment, with no trailing slash, e.g. `https://zms-business-consultancy-38nn.vercel.app` or the production domain. Drives canonical URLs, Open Graph, the sitemap and JSON-LD. Falls back to the `https://example.com` placeholder when unset. |
 | `RESEND_API_KEY` | API key from [resend.com/api-keys](https://resend.com/api-keys) |
 | `CONTACT_TO_EMAIL` | Inbox that receives enquiries |
 | `CONTACT_FROM_EMAIL` | Sender address on a domain verified in Resend |
@@ -96,7 +97,9 @@ export const site = {
 
 While `isPlaceholder` is `true`:
 
-- every page sends `noindex, nofollow` and `robots.txt` disallows all crawling;
+- every page sends `noindex, nofollow`, and `robots.txt` disallows all crawling except Anthropic's
+  crawlers (`ClaudeBot`, `Claude-User`, `anthropic-ai`), which are allowed so a reviewer can open the
+  staged site. The pages stay `noindex` for everyone;
 - the phone number and WhatsApp button are shown but not clickable;
 - the Privacy and Terms pages display "Draft pending legal review".
 

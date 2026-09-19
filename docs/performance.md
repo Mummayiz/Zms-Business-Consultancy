@@ -46,7 +46,22 @@ SEO scores 69 on every page because the site is deliberately `noindex` while
 
 Both are worth knowing about before anyone "improves" them back.
 
-## Remaining gap, and what closing it would cost
+## Resolved on production (19 September 2026)
+
+Measured against the Vercel deployment, the gap below closed on its own: the CDN, brotli and HTTP/2
+recover what the local server could not.
+
+| | Local `next start` | Vercel |
+|---|---|---|
+| Desktop Home / Contact | 100 / 100 | **98–100 / 100** |
+| Mobile Home | 82–87, LCP 3.2s | **87–90, LCP 2.6s** |
+| Mobile Contact | 82–89 | **82–91** |
+
+**Mobile now meets the ≥90 target, so both structural options below are rejected.** Motion stays in
+use across the site as the brief requires, and the hero photograph stays at its supplied resolution.
+The section is kept for the record of what was measured and why nothing further was changed.
+
+## The gap as it stood locally, and what closing it would have cost
 
 Mobile Home measures **82–87** locally, short of the 90 target. Note that scores on this machine vary
 by up to 10 points between identical runs, because Lighthouse's mobile profile (4x CPU slowdown,
@@ -71,4 +86,4 @@ Options that would close the gap, each needing a decision because they change ap
    throttling profile.
 
 No further optimisation was applied without sign-off, since each option changes something already
-approved.
+approved — and on production none of it proved necessary.

@@ -9,7 +9,8 @@ export const site = {
   email: "info@example.com",
   phone: "+971 00 000 0000",
   whatsapp: "971000000000",
-  url: "https://example.com",
+  // Set NEXT_PUBLIC_SITE_URL per environment in Vercel; the placeholder is the fallback.
+  url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://example.com",
   isPlaceholder: true,
 };
 
