@@ -19,7 +19,20 @@ export function useSceneMotion() {
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
     const fine = window.matchMedia("(min-width: 768px) and (hover: hover) and (pointer: fine)");
 
-    const sync = () => setState({ motion: !reduced.matches, pointer: !reduced.matches && fine.matches });
+    /*
+     * `?motion=on` lets a visitor watch the motion layer even though their
+     * system asks for reduced motion — useful for reviewing the site on a
+     * machine with Windows "Animation effects" turned off. It is opt-in by the
+     * visitor themselves; without it the system preference always wins.
+     */
+    const forced = new URLSearchParams(window.location.search).get("motion") === "on";
+    // Also releases the CSS reduced-motion overrides (see globals.css).
+    if (forced) document.documentElement.setAttribute("data-force-motion", "");
+
+    const sync = () => {
+      const allowed = forced || !reduced.matches;
+      setState({ motion: allowed, pointer: allowed && fine.matches });
+    };
     sync();
 
     reduced.addEventListener("change", sync);

@@ -220,33 +220,38 @@
 }
 
 /* ---------- Reduced motion ---------- */
+/*
+ * Scoped to `:root:not([data-force-motion])` so a visitor who has explicitly
+ * opted in with `?motion=on` can watch the motion layer. Without that opt-in
+ * the system preference always wins.
+ */
 @media (prefers-reduced-motion: reduce) {
-  .hero-bg,
-  .hero-line,
-  .hero-rule,
-  .hero-step,
-  .depth-bar {
+  :root:not([data-force-motion]) .hero-bg,
+  :root:not([data-force-motion]) .hero-line,
+  :root:not([data-force-motion]) .hero-rule,
+  :root:not([data-force-motion]) .hero-step,
+  :root:not([data-force-motion]) .depth-bar {
     animation: none !important;
   }
   /* No pointer sheen and no button sweep */
-  .btn-sheen::after {
+  :root:not([data-force-motion]) .btn-sheen::after {
     display: none !important;
   }
   /* Motion-driven reveals render in their final state */
-  [data-motion] {
+  :root:not([data-force-motion]) [data-motion] {
     opacity: 1 !important;
     transform: none !important;
     clip-path: none !important;
   }
-  [data-motion] path,
-  path[data-motion] {
+  :root:not([data-force-motion]) [data-motion] path,
+  :root:not([data-force-motion]) path[data-motion] {
     stroke-dasharray: none !important;
     stroke-dashoffset: 0 !important;
     opacity: 1 !important;
   }
-  *,
-  *::before,
-  *::after {
+  :root:not([data-force-motion]) *,
+  :root:not([data-force-motion]) *::before,
+  :root:not([data-force-motion]) *::after {
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }

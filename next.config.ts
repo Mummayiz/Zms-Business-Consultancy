@@ -6,6 +6,12 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: path.join(__dirname),
   },
+  /*
+   * Development only: allow this machine's LAN address to load dev resources
+   * (HMR included), so the site can be opened on a phone on the same network.
+   * Has no effect on production builds.
+   */
+  allowedDevOrigins: ["192.168.31.227"],
   images: {
     /*
      * WebP only: AVIF saved ~13KB but cost over a second of main-thread decode
