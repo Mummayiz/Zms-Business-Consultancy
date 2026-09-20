@@ -15,6 +15,10 @@ import { Reveal } from "@/components/motion/Reveal";
  *
  * The rule scale travels to the card as a CSS variable, so ServiceCard stays a
  * server component.
+ *
+ * The outer element always carries the scroll ref, in both branches: useScroll
+ * measures its target on mount, and `useSceneMotion` only settles afterwards,
+ * so a ref attached in just one branch would never be hydrated.
  */
 export function ServiceColumn({
   index,
@@ -45,23 +49,21 @@ export function ServiceColumn({
   const opacity = useTransform(progress, contentRange, [0, 1], { clamp: true });
   const y = useTransform(progress, contentRange, [12, 0], { clamp: true });
 
-  if (!scrollLinked) {
-    return (
-      <Reveal delay={index * 0.12} className={className}>
-        {children}
-      </Reveal>
-    );
-  }
-
   return (
-    <m.div
-      ref={ref}
-      className={className}
-      data-motion
-      // Motion writes the rule scale into a CSS variable the card reads.
-      style={{ "--rule-scale": ruleScale, opacity, y } as unknown as MotionStyle}
-    >
-      {children}
-    </m.div>
+    <div ref={ref} className={className}>
+      {scrollLinked ? (
+        <m.div
+          className="h-full"
+          data-motion
+          style={{ "--rule-scale": ruleScale, opacity, y } as unknown as MotionStyle}
+        >
+          {children}
+        </m.div>
+      ) : (
+        <Reveal delay={index * 0.12} className="h-full">
+          {children}
+        </Reveal>
+      )}
+    </div>
   );
 }

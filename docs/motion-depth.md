@@ -106,6 +106,71 @@ competing with it, and the hero is composed to look complete without it.
 
 Against the stated gates: desktop ≥95 ✓, mobile ≥85 ✓, CLS 0 ✓, added JS ≤12KB ✗ (17KB, see below).
 
+## Bug: "Target ref is defined but not hydrated"
+
+**Symptom:** a runtime error on the Home page in `npm run dev`, and no animation at all.
+
+**Cause.** `useScroll({ target: ref })` measures its element on mount, so the ref has to be attached
+to a real DOM element on *every* render — Motion's troubleshooting page is explicit that "the `ref` is
+not correctly being passed to an element" is the cause, and that a component wrapper alone will not do.
+
+`ServiceColumn` attached its ref only in the scroll-linked branch:
+
+```tsx
+if (!scrollLinked) return <Reveal …>{children}</Reveal>;   // ← no ref here
+return <m.div ref={ref} …>{children}</m.div>;
+```
+
+`useSceneMotion` deliberately reports `false` on the server and on the first client render, so the
+fallback branch is *always* what renders when `useScroll` first measures. The ref was therefore never
+hydrated on any device, and on mobile or under reduced motion it never would be.
+
+**Fix.** The outer element now carries the ref unconditionally, and the branch only decides what goes
+inside it:
+
+```tsx
+<div ref={ref} className={className}>
+  {scrollLinked ? <m.div style={…}>{children}</m.div> : <Reveal …>{children}</Reveal>}
+</div>
+```
+
+Audited every other `useScroll` call at the same time: `HeroBackdrop`, `ProcessSteps` and
+`SignatureScene` all attach their refs unconditionally in every branch, and `HeroDivider` tracks the
+viewport with no target at all. Also deleted `useSceneProgress` and `ScrollScene` from
+`components/motion/ScrollScene.tsx` — they were unused, and handing a ref back for a caller to attach
+is exactly the trap that caused this.
+
+### Why the first round of testing missed it
+
+Two mistakes, both mine:
+
+1. **I only tested the production build.** Motion's hydration check is a development-time invariant,
+   compiled out of production bundles. `next start` could never have shown it. The symptom the client
+   saw — nothing animating — was also dev-only, because the thrown error aborted the render.
+2. **My scene probes did not listen for console output.** They asserted on computed styles only, so a
+   page throwing errors still "passed". Worse, the scroll-linked service columns were reporting
+   `opacity: 0.00` in an earlier probe and I read that as "mid-sequence" instead of "dead".
+
+### The check that now catches it
+
+`verify-motion.mjs` (in the session scratchpad) runs the same suite against **both** `npm run dev`
+and a production build, and fails on:
+
+- any uncaught page error, any `console.error`, or any message matching `/motion|hydrat|useScroll|Target ref/`;
+- the presence of the Next.js dev error overlay (`nextjs-portal` shadow root);
+- each scene not actually running: the divider must start undrawn and finish drawn, service rules must
+  reach full width with content at full opacity, signature planes must diverge, process bars must
+  reach their expected heights and the curve must draw;
+- the latch releasing (divider must stay drawn after scrolling back to the top);
+- anything left faded on screen after jumping to the bottom of the page.
+
+I verified the harness by stashing the fix and re-running it: it reported the error overlay, the exact
+`Target ref is defined but not hydrated` page error and three dead service columns. With the fix
+restored, dev and production both pass all 13 checks.
+
+It needs `puppeteer-core`, which is not a project dependency — say the word and I will add it as a
+devDependency with an `npm run verify:motion` script so this runs from the repo.
+
 ## What didn't go exactly as specified
 
 1. **Photo layer separation was impossible** — see Item 1. Composition-based depth was approved as

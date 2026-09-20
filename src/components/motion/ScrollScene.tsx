@@ -1,30 +1,16 @@
 "use client";
 
-import { useRef, type ReactNode, type RefObject } from "react";
-import {
-  useMotionValue,
-  useMotionValueEvent,
-  useScroll,
-  useTransform,
-  type MotionValue,
-} from "motion/react";
-import { sceneOffset } from "@/lib/scroll";
+import { useMotionValue, useMotionValueEvent, useTransform, type MotionValue } from "motion/react";
 
-/**
- * Progress of a section through the viewport, 0 → 1 (see `sceneOffset`).
- * Returns a ref to attach to the section and its progress value.
+/*
+ * Helpers for scroll-linked sequences.
+ *
+ * Note on refs: `useScroll({ target })` measures its element on mount, so the
+ * ref must be attached to a real DOM element on every render — including any
+ * fallback branch — or Motion throws "Target ref is defined but not hydrated".
+ * Each scene therefore owns its own ref and attaches it unconditionally; this
+ * module deliberately does not hand out refs for callers to attach.
  */
-export function useSceneProgress<T extends HTMLElement = HTMLDivElement>(): {
-  ref: RefObject<T | null>;
-  progress: MotionValue<number>;
-} {
-  const ref = useRef<T>(null);
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: sceneOffset as unknown as ["start 85%", "start 35%"],
-  });
-  return { ref, progress: scrollYProgress };
-}
 
 /**
  * A progress value that only ever moves forwards.
@@ -50,24 +36,4 @@ export function useScenePart(
   output: [number, number],
 ) {
   return useTransform(progress, input, output, { clamp: true });
-}
-
-/** Wraps a section, giving its children a latched scroll progress value. */
-export function ScrollScene({
-  children,
-  className,
-  as: Tag = "div",
-}: {
-  children: (progress: MotionValue<number>) => ReactNode;
-  className?: string;
-  as?: "div" | "section";
-}) {
-  const { ref, progress } = useSceneProgress<HTMLDivElement>();
-  const latched = useLatched(progress);
-
-  return (
-    <Tag ref={ref} className={className}>
-      {children(latched)}
-    </Tag>
-  );
 }
