@@ -50,9 +50,11 @@ heading.
 mean changing a page that is out of scope for this rebuild. The links are correct and harmless; the
 preselection needs a separate change to Contact.
 
-**3. The mobile poster LCP gate is not met in Lighthouse.** 3.69–3.76s against ≤3.0s. The video was
-ruled out as the cause by measurement, and the fix needs sign-off because it would mean a smaller
-poster file. Full working in `performance.md`.
+**3. The mobile poster LCP gate is still not met in Lighthouse.** 3.56s against ≤3.0s, improved from
+3.69s by the smaller supplied posters. Two things were ruled out as the cause by measurement: the
+video (blocking it changes nothing) and, in the end, the poster itself — Lighthouse's figure is
+dominated by hydration render delay, so halving the poster moved it only ~130ms. Full working in
+`performance.md`, including an estimate of mine that proved wrong by roughly a second.
 
 ## Fixed during review
 

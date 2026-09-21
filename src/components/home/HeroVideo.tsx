@@ -10,10 +10,10 @@ import { useEffect, useRef, useState, useSyncExternalStore } from "react";
  * optimiser's quality would only soften them. It paints immediately and is the
  * LCP element.
  *
- * Each video has its own poster, frame-zero of that exact file, so the handover
- * is invisible. The poster pair is chosen by <picture> at parse time and the
- * video pair on mount, so exactly one of each is ever downloaded — and the
- * video never before first paint.
+ * Each video has its own poster, frame zero of that exact file, so the handover
+ * is invisible. <picture> picks the poster at parse time and the effect picks
+ * the video on mount, so exactly one poster and one video are ever downloaded —
+ * and the video never before first paint.
  *
  * Atmosphere only: no captions, no audio, no controls, and nothing that says
  * where the footage was shot.
@@ -26,11 +26,18 @@ const LANDSCAPE = {
   height: 1080,
 };
 
+/*
+ * Frame zero of hero-mobile.mp4 at the size a phone actually paints it: 780px
+ * covers a 390px viewport at DPR 2, where the supplied 1080×1920 poster was
+ * 128KB of detail no phone could resolve. Both are supplied files, served as
+ * given. WebP first, JPEG for anything that cannot read it.
+ */
 const PORTRAIT = {
   video: "/media/hero-mobile.mp4",
-  poster: "/media/hero-poster-mobile.jpg",
-  width: 1080,
-  height: 1920,
+  posterWebp: "/media/hero-poster-mobile-780.webp",
+  poster: "/media/hero-poster-mobile-780.jpg",
+  width: 780,
+  height: 1387,
 };
 
 const FALLBACK = "/brand/zms-hero-background.jpg";
@@ -119,7 +126,14 @@ export function HeroVideo() {
         one after hydration — 232KB, and LCP at 2.6s instead of ~1.5s.
       */}
       <picture>
-        {!failed && <source media="(min-width: 768px)" srcSet={LANDSCAPE.poster} />}
+        {!failed && (
+          <>
+            {/* Desktop first: on ≥768px this wins and nothing below is read. */}
+            <source media="(min-width: 768px)" srcSet={LANDSCAPE.poster} />
+            {/* Phones: WebP where it is understood, else the <img> JPEG. */}
+            <source type="image/webp" srcSet={PORTRAIT.posterWebp} />
+          </>
+        )}
         <img
           src={failed ? FALLBACK : PORTRAIT.poster}
           alt=""
@@ -139,7 +153,13 @@ export function HeroVideo() {
           playsInline
           autoPlay
           preload="none"
-          poster={pair.poster}
+          /*
+           * No poster attribute. The <img> above is already frame zero and sits
+           * beneath this element, which stays at opacity 0 until it can play, so
+           * a poster here would never be seen — but it would still be fetched,
+           * and on phones it no longer matches the file <picture> chose. That is
+           * a third download of the same frame.
+           */
           onCanPlay={() => setReady(true)}
           onError={() => setFailed(true)}
           className={`absolute inset-0 h-full w-full object-cover object-[74%_40%] transition-opacity duration-700 ease-zms md:object-[center_40%] ${

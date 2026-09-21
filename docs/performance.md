@@ -156,16 +156,61 @@ Deferring the video load is already in place and is what took mobile from 80 to 
 attached only after `load` and on an idle callback, and connections reporting `saveData` or 2g/3g
 never fetch it at all.
 
-### The fix, which needs a decision
+### The smaller mobile poster, and what it actually bought
 
-The one change that would close the gap is **a smaller mobile poster**: at 390px CSS width the
-browser needs roughly 780px of pixels, not 1080px. Re-encoding `hero-poster-mobile.jpg` at ~780px
-wide would take it from 128KB to roughly 45KB and bring LCP to about 2.2–2.4s in Lighthouse, with
-headroom to spare.
+Two smaller posters were supplied — not re-encoded here — and added to the mobile `<source>`:
 
-This has not been done, because the instruction was explicit: *"All four files are already encoded and
-compressed for web. Do not re-encode, resize or regenerate them."* It needs sign-off, and it would
-mean a fifth file (a smaller portrait poster) rather than altering any of the four supplied.
+```
+hero-poster-mobile-780.webp   780×1387   64KB   ← used
+hero-poster-mobile-780.jpg    780×1387   94KB   ← fallback where WebP is not read
+hero-poster.jpg               1920×1080  104KB  ← desktop, unchanged
+```
 
-The alternative — cutting JavaScript — is worth less than it looks: perfect hydration still lands at
-roughly 2.9–3.0s, and the brief asks for more motion on this page, not less.
+`<picture>` now reads: desktop `media` source first, then a `type="image/webp"` source for phones,
+then the JPEG as the `<img>`. Desktop is untouched. Exactly one poster is still downloaded, verified
+on both viewports.
+
+The `<video>` **lost its `poster` attribute.** It was never visible — the element sits at opacity 0
+until it can play, above an `<img>` that is already frame zero — but it was still being fetched, and
+on phones it no longer pointed at the file `<picture>` chose. Keeping it would have meant a third
+download of the same frame.
+
+**I predicted this would bring LCP to 2.2–2.4s. That was wrong,** and the error is worth recording: I
+attributed far too much of the LCP to image bytes. What it actually bought, measured by interleaving
+the two builds in the same machine state so that local noise cancels:
+
+| | before (128KB JPEG) | after (64KB WebP) |
+|---|---|---|
+| Lighthouse mobile LCP, median | 3.69s | **3.56s** (range 3.48–3.77) |
+| `lcpLoadDuration` (simulated transfer) | 756–948ms | **462–589ms** |
+| LCP with all JavaScript blocked | 2.71s | **2.41s** |
+| poster download ends (real throttled browser) | 2585ms | **2104ms** |
+| total page weight, mobile | 3209KB | 3146KB |
+
+So the transfer is genuinely and repeatably faster — about 300ms at the JavaScript-free floor, and
+~480ms earlier on the wire in a real browser — but only ~130ms of that reaches the Lighthouse LCP
+figure. **The gate is still breached at 3.56s against ≤3.0s.**
+
+The reason is the one already established above: Lantern's LCP for this page is dominated by render
+delay (2.1–2.8s), which tracks JavaScript hydration under its 4x CPU model, not by the poster. The
+poster was never the binding constraint; halving it moved the floor from 2.71s to 2.41s and left the
+render delay untouched. What it did buy is headroom: the JavaScript budget under a 3.0s gate is now
+about 590ms rather than 290ms.
+
+Closing the remaining ~560ms means reducing hydration on this page, which runs against the brief's
+instruction to add motion rather than remove it. That is a decision, not an optimisation, and it has
+not been taken.
+
+### A note on these numbers
+
+The absolute scores in this section are lower than those in the table at the top: mobile TBT measured
+84–127ms during the deck rebuild and 286–649ms during these runs, on the same code, which drags the
+performance score from 88–89 down to a median of 75. Free memory on this laptop was about 2.1GB of
+12GB while measuring. The before/after comparison above is still sound because the two builds were
+interleaved and measured against each other, but the absolute figures should be re-taken on a quiet
+machine, and production on Vercel should measure better than either.
+
+A first pass at these measurements was discarded: nine orphaned Edge processes from the probe harness
+had accumulated, and the resulting memory pressure pushed the H1 paint — which no poster change can
+affect — from 1504ms to 5800ms. Decode time was checked directly and ruled out as a cause: WebP and
+JPEG both decode in 20–35ms at these sizes, at 1x and 4x CPU throttling.
