@@ -22,7 +22,6 @@ import { HeroDivider } from "@/components/home/HeroDivider";
 import { TearGate } from "@/components/home/TearGate";
 import { ServiceSelector } from "@/components/home/ServiceSelector";
 import { PathsForward } from "@/components/home/PathsForward";
-import { DeckChrome } from "@/components/home/deck/DeckChrome";
 import { Slide } from "@/components/home/deck/Slide";
 import { Eyebrow } from "@/components/home/deck/Eyebrow";
 import { DisplayHeading } from "@/components/home/deck/DisplayHeading";
@@ -42,7 +41,6 @@ export default function HomePage() {
   return (
     <>
       <TearGate />
-      <DeckChrome />
 
       {/* 01 — Hero */}
       <Slide
@@ -65,21 +63,13 @@ export default function HomePage() {
         }
       >
         <div className="max-w-[48rem]">
-          <p className="type-label flex items-center gap-4 text-navy">
-            <span className="rule-taper hero-rule origin-right" aria-hidden />
-            <span className="hero-step" style={{ "--i": 0 } as React.CSSProperties}>
-              {heroSlide.eyebrow}
-            </span>
-            <span className="rule-taper hero-rule origin-left" aria-hidden />
-          </p>
-
           {/*
             The deck brief calls for a gold accent on the video hero, as the
             reference has. Ours reads against a bright scene behind an ivory
             glow, where gold measures ~2.4:1 — the contrast the master brief
             forbids outright. The accent is italic navy here instead.
           */}
-          <div className="hero-mask mt-8">
+          <div className="hero-mask">
             <DisplayHeading as="h1" id="hero-title" parts={heroSlide.headline} tone="light" focusable />
           </div>
 

@@ -11,21 +11,22 @@ import { site, licenceFull } from "@/config/site";
 
 export type HeadlinePart = { text: string; italic?: boolean; accent?: boolean; break?: boolean };
 
-/** Slide identity, used by the deck chrome and the right-hand rail. */
+/**
+ * Slide identity: the anchor each slide is reached by, and its position in the
+ * sequence. The labels and Roman numerals that used to sit here went with the
+ * deck chrome.
+ */
 export const slides = [
-  { id: "hero", number: "01", label: "Abu Dhabi", roman: "I" },
-  { id: "firm", number: "02", label: "The firm", roman: "II" },
-  { id: "services", number: "03", label: "Services", roman: "III" },
-  { id: "signature", number: "04", label: "Signature", roman: "IV" },
-  { id: "approach", number: "05", label: "Approach", roman: "V" },
-  { id: "standing", number: "06", label: "Standing", roman: "VI" },
-  { id: "contact", number: "07", label: "Get in touch", roman: "VII" },
+  { id: "hero", number: "01" },
+  { id: "firm", number: "02" },
+  { id: "services", number: "03" },
+  { id: "signature", number: "04" },
+  { id: "approach", number: "05" },
+  { id: "standing", number: "06" },
+  { id: "contact", number: "07" },
 ] as const;
 
-export const TOTAL = slides.length;
-
 export const heroSlide = {
-  eyebrow: "Abu Dhabi",
   headline: [
     { text: "Clear " },
     { text: "direction", italic: true, accent: true },

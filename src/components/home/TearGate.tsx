@@ -83,21 +83,6 @@ export function TearGate() {
    * keyboard at the window. A handler on the panel alone never fires: focus
    * starts on <body>, and events bubble up, not down — which left Enter dead.
    */
-  /*
-   * Flag the gate on the document while it is up. The torn edge deliberately
-   * leaves a few percent of the left uncovered, which was enough to show the
-   * slide counter through it; the deck chrome fades out until the gate has
-   * gone. See `[data-gate="open"]` in globals.css.
-   */
-  useEffect(() => {
-    if (!shouldGate || dismissed) return;
-    const root = document.documentElement;
-    root.dataset.gate = "open";
-    return () => {
-      delete root.dataset.gate;
-    };
-  }, [shouldGate, dismissed]);
-
   useEffect(() => {
     if (!shouldGate || dismissed) return;
     panelRef.current?.focus();

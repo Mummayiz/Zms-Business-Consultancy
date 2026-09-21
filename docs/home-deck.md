@@ -1,15 +1,15 @@
 # Home — deck rebuild
 
 Home only. About, Services, the three service pages, Approach, Contact, Privacy, Terms and 404 are
-untouched, and so is the shared nav: the deck chrome lives inside the Home slides.
+untouched, and so is the shared nav.
 
 ## What is on the page
 
-Seven full-height slides, numbered in the chrome and in Roman numerals in the slide corners:
+Seven full-height slides:
 
 | | Slide | Content |
 |---|---|---|
-| 01 | Hero | Video background, poster-first, headline, two buttons, scroll cue |
+| 01 | Hero | Video background, poster-first, headline first with no eyebrow, two buttons, scroll cue |
 | 02 | The firm | Who ZMS is, plus the facts row |
 | 03 | Services | Tile selector across the three services |
 | 04 | Signature | Navy slide: the mark, the orbit, three pillars |
@@ -17,10 +17,15 @@ Seven full-height slides, numbered in the chrome and in Roman numerals in the sl
 | 06 | Standing | Licence panel and the confirmed Why ZMS points |
 | 07 | Get in touch | Three routes into the enquiry form |
 
-Deck chrome is the slide counter (bottom left) and the tick rail (right edge). The rail is a real
-`<nav aria-label="Slides">` with anchor links and `aria-current`; the counter is decorative. Labels on
-the rail appear only at `2xl`, where there is a gutter wide enough to hold them without colliding
-with the content column.
+The slides carry no chrome. The counter, the tick rail and the corner Roman numerals were all
+removed, along with the hero's "Abu Dhabi" eyebrow and the two gold rules that flanked it — on the
+hero the headline is now the first thing on the slide. The eyebrow labels on slides 02–07 stay.
+
+Each slide still has an `id`, so `#firm`, `#services` and the rest remain valid anchors; the hero's
+scroll cue still points at `#firm`. What went with the chrome was its data: the per-slide `label` and
+`roman` fields and `TOTAL` in `data/deck.ts`, `heroSlide.eyebrow`, the `data-tone` attribute the rail
+used to read the slide's tone, the `.deck-chrome` and `[data-gate="open"]` rules, and the `.hero-rule`
+class with its `hero-draw-x` keyframe. `rule-taper` stays — the other pages use it.
 
 ## Content rules
 
@@ -58,7 +63,7 @@ dominated by hydration render delay, so halving the poster moved it only ~130ms.
 
 ## Fixed during review
 
-Four things the screenshots caught that the build and the audits did not:
+Two layout faults the screenshots caught that the build and the audits did not:
 
 - **Slides were taller than the screen.** The nav is `sticky`, so it holds 72px (84px from `lg`) of
   the viewport on every slide, but each slide measured `min-h-svh`. Now
@@ -67,16 +72,33 @@ Four things the screenshots caught that the build and the audits did not:
   inside the padded content column, where `bottom` resolves against the height of the text rather
   than the slide. `Slide` grew an `overlay` slot — full-bleed, in front, after the content in tab
   order — and the cue moved into it.
-- **The slide counter showed through the gate.** The tear's jagged edge deliberately leaves a few
-  percent of the left uncovered, which was enough to reveal the counter behind it. `TearGate` now
-  sets `data-gate="open"` on the document and the chrome fades out until the gate has gone.
-- **The chrome was invisible on the navy slide.** It is fixed, so it sits over whichever slide is in
-  view, and navy ink on slide 04 left the counter and the inactive ticks unreadable. `Slide` exposes
-  `data-tone` and the chrome follows it.
 
-axe does not catch the last two: the chrome is `position: fixed`, so axe resolves its background
-against the page, not against the slide that happens to be behind it. Both were found by reading the
-screenshots.
+Two further faults were found in the chrome — the counter showing through the gate's torn edge, and
+navy-on-navy chrome being unreadable over slide 04 — and both were fixed at the time. The chrome has
+since been removed outright, so those fixes went with it.
+
+### The doubled Roman numerals
+
+Reported at slide 3: `II / VII` and `III / VII` on screen together. The cause was not state but
+duplication — `Slide` rendered its numeral **twice per section**, once at `top-8 right-8` and once at
+`right-8 bottom-8`:
+
+```tsx
+<span className="absolute top-8 right-8 …">{slide.roman} / {romanTotal}</span>
+<span className="absolute right-8 bottom-8 …">{slide.roman} / {romanTotal}</span>
+```
+
+Static decoration anchored to each slide's own top and bottom edges, on the assumption that only one
+slide is ever in view. It isn't: at any boundary, slide N's bottom numeral and slide N+1's top
+numeral are both visible, which is exactly what was seen.
+
+**Nothing else shares that cause.** The numerals were the only element rendered twice per slide. The
+other edge-anchored decoration on Home was checked and is all single-instance and slide-scoped:
+`HeroDivider` and the scroll cue exist on the hero alone, `HeroVideo`'s bottom fade sits inside the
+hero's own background layer, `TearGate`'s gold line lives inside the fixed gate overlay, and
+`PathsForward`'s gold edge is anchored to a card rather than a slide. `DeckChrome` made the same
+"one slide in view" assumption but resolved it correctly, with an IntersectionObserver and a
+`-45% 0px -45% 0px` root margin that picked a single active slide. Both are now gone regardless.
 
 ## The tear gate
 
@@ -101,8 +123,13 @@ axe-core 4.13, WCAG 2.0/2.1 A and AA, at 390px and 1440px, with the gate up and 
 
 The hero needed an ivory scrim to get there. Against the supplied footage, navy text measured 2.56:1;
 the wash takes it to 14.35:1 on desktop and 12.07:1 on mobile while leaving the right of the frame
-clear, where no text sits. The decorative Roman numerals are real visible text, so they meet contrast
-like anything else — `navy/70` on light slides, `ivory/70` on the navy one.
+clear, where no text sits.
+
+Removing the chrome took the page's only decorative text with it. While it existed it had to meet
+contrast like anything else, which is why the numerals were raised to `navy/70` on light slides and
+`ivory/70` on the navy one; the tick rail also carried the slide anchors as a real
+`<nav aria-label="Slides">`. Those anchors were navigational duplicates of the nav and the scroll
+cue, so nothing reachable was lost — every slide still has its `id`.
 
 Under `lg` the tile selector is not a tablist at all: the three services render as stacked
 `<article>` elements, so there is nothing to operate by keyboard or pointer that a tap cannot reach.

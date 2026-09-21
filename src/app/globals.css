@@ -159,14 +159,6 @@
     transform: scaleY(1);
   }
 }
-@keyframes hero-draw-x {
-  from {
-    transform: scaleX(0);
-  }
-  to {
-    transform: scaleX(1);
-  }
-}
 
 .hero-bg {
   animation: hero-bg var(--motion-bg) var(--motion-ease) both;
@@ -175,10 +167,6 @@
   transform-origin: bottom;
   animation: hero-rise var(--motion-rise) var(--motion-ease) both;
   animation-delay: calc(var(--i, 0) * var(--motion-stagger) + 0.1s);
-}
-.hero-rule {
-  animation: hero-draw-x var(--motion-base) var(--motion-ease) both;
-  animation-delay: 0.2s;
 }
 .hero-step {
   animation: hero-fade-up var(--motion-base) var(--motion-ease) both;
@@ -231,19 +219,6 @@
   animation: deck-cue 2.6s var(--ease-zms) infinite;
 }
 
-/*
- * Deck chrome stands down while the tear gate is up. The gate's torn edge
- * leaves a sliver of the left uncovered by design, which was enough to show
- * the slide counter through it. TearGate sets the flag.
- */
-.deck-chrome {
-  transition: opacity 500ms var(--ease-zms);
-}
-[data-gate="open"] .deck-chrome {
-  opacity: 0;
-  pointer-events: none;
-}
-
 /* ---------- Button sheen ---------- */
 @media (hover: hover) and (pointer: fine) {
   .btn-sheen::after {
@@ -269,7 +244,6 @@
 @media (prefers-reduced-motion: reduce) {
   :root:not([data-force-motion]) .hero-bg,
   :root:not([data-force-motion]) .hero-line,
-  :root:not([data-force-motion]) .hero-rule,
   :root:not([data-force-motion]) .hero-step,
   :root:not([data-force-motion]) .hero-mask > *,
   :root:not([data-force-motion]) .deck-cue {

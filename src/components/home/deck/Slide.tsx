@@ -1,12 +1,11 @@
 import type { ReactNode } from "react";
-import { TOTAL, slides } from "@/data/deck";
+import { slides } from "@/data/deck";
 import { Grain } from "@/components/ui/Grain";
 import { PointerLight } from "@/components/ui/PointerLight";
 
 /**
- * One deck slide: a full-height section carrying its Roman numerals in the top
- * and bottom right corners. The numerals are decorative, so they are hidden
- * from assistive technology — the rail in DeckChrome carries the real links.
+ * One deck slide: a full-height section, dark or light, with optional
+ * full-bleed layers behind and in front of its padded content column.
  */
 export function Slide({
   id,
@@ -37,8 +36,6 @@ export function Slide({
 }) {
   const slide = slides.find((s) => s.id === id)!;
   const dark = tone === "dark";
-  // Decorative, but still visible text: it has to meet contrast like any other.
-  const numerals = dark ? "text-ivory/70" : "text-navy/70";
 
   /*
    * The nav is sticky, so it holds 72px (84px from lg) of the viewport on every
@@ -51,7 +48,6 @@ export function Slide({
       id={id}
       aria-labelledby={labelledBy}
       data-slide={slide.number}
-      data-tone={tone}
       className={`deck-slide relative flex min-h-[calc(100svh-72px)] flex-col justify-center overflow-hidden py-24 lg:min-h-[calc(100svh-84px)] lg:py-28 ${
         dark ? "surface-navy bg-navy text-ivory" : "border-t border-navy/12"
       } ${className}`}
@@ -65,18 +61,9 @@ export function Slide({
         </>
       )}
 
-      <span aria-hidden className={`type-label absolute top-8 right-8 hidden lg:block ${numerals}`}>
-        {slide.roman} / {romanTotal}
-      </span>
-      <span aria-hidden className={`type-label absolute right-8 bottom-8 hidden lg:block ${numerals}`}>
-        {slide.roman} / {romanTotal}
-      </span>
-
       <div className={`wrap relative w-full ${contentClassName}`}>{children}</div>
 
       {overlay}
     </section>
   );
 }
-
-const romanTotal = ["I", "II", "III", "IV", "V", "VI", "VII"][TOTAL - 1];
