@@ -24,10 +24,23 @@ export function useSceneMotion() {
      * system asks for reduced motion — useful for reviewing the site on a
      * machine with Windows "Animation effects" turned off. It is opt-in by the
      * visitor themselves; without it the system preference always wins.
+     *
+     * The choice is remembered for the browser session, so it survives
+     * navigation between pages (otherwise clicking any nav link dropped the
+     * parameter and the motion vanished again). `?motion=off` clears it.
      */
-    const forced = new URLSearchParams(window.location.search).get("motion") === "on";
+    const param = new URLSearchParams(window.location.search).get("motion");
+    let stored: string | null = null;
+    try {
+      if (param === "on") sessionStorage.setItem("zms-motion", "on");
+      if (param === "off") sessionStorage.removeItem("zms-motion");
+      stored = sessionStorage.getItem("zms-motion");
+    } catch {
+      // Private mode or blocked storage: fall back to the parameter alone.
+    }
+    const forced = param === "on" || (param !== "off" && stored === "on");
     // Also releases the CSS reduced-motion overrides (see globals.css).
-    if (forced) document.documentElement.setAttribute("data-force-motion", "");
+    document.documentElement.toggleAttribute("data-force-motion", forced);
 
     const sync = () => {
       const allowed = forced || !reduced.matches;
