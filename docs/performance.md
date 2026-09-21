@@ -87,3 +87,85 @@ Options that would close the gap, each needing a decision because they change ap
 
 No further optimisation was applied without sign-off, since each option changes something already
 approved — and on production none of it proved necessary.
+
+---
+
+# Performance — Home deck rebuild
+
+Measured with Lighthouse 13.4 against the production build (`next build` + `next start`), Home only.
+Median of three runs; the deck rebuild changed no other page.
+
+| | Before (motion/depth Home) | After (deck Home) |
+|---|---|---|
+| Desktop | perf **100**, LCP 0.76s, TBT 5ms | perf **100**, LCP 0.75s, TBT 0ms |
+| Mobile | perf **89**, LCP 3.2s, TBT 380ms | perf **88–89**, LCP 3.69–3.76s, TBT 84–127ms |
+| CLS | 0 | **0** on both |
+| axe violations | 0 | **0** (390px and 1440px, gate up and dismissed) |
+
+Gates from the brief: desktop ≥95 **met (100)**, mobile ≥85 **met (88–89)**, CLS 0 **met**,
+axe 0 **met**. The poster LCP gate of ≤3.0s mobile is **not met in Lighthouse** — see below.
+
+## The two posters
+
+`hero-desktop.mp4` pairs with `hero-poster.jpg` (1920×1080) and `hero-mobile.mp4` with
+`hero-poster-mobile.jpg` (1080×1920). Each poster is frame zero of its own file, so the handover from
+still to video is invisible. All four are served exactly as supplied — not re-encoded, resized or
+passed through the image optimiser, which is why the poster is a plain `<img>` rather than
+`next/image`.
+
+Choosing the pair in an effect was wrong, and measurably so. The first render had to pick a default,
+so phones fetched the **landscape** poster immediately and then the portrait one after hydration:
+
+```
+hero-poster.jpg         start=341ms  end=2485ms  104KB   ← wrong file, and the LCP element
+hero-poster-mobile.jpg  start=3035ms end=4734ms  128KB   ← the right one, far too late
+```
+
+A `<picture>` with `<source media="(min-width: 768px)">` and a portrait `<img>` fallback moves the
+choice to HTML parse time, so the preload scanner fetches one file and the correct one:
+
+```
+mobile  → hero-poster-mobile.jpg start=271ms end=2483ms 128KB   poster files downloaded: 1
+desktop → hero-poster.jpg        start=97ms  end=140ms  104KB   poster files downloaded: 1
+```
+
+That removed 104KB of wasted mobile transfer and moved the poster request from 341ms to ~270ms.
+
+## The mobile LCP gate: 3.7s against ≤3.0s
+
+**The video is not the cause.** Blocking it outright changes nothing, which rules it out:
+
+| variant | mobile LCP | perf |
+|---|---|---|
+| as shipped | 3.76s | 89 |
+| `*.mp4` blocked | 3.76s | 89 |
+| all JavaScript blocked | **2.71s** | 96 |
+
+So the excess is React hydration (~1.05s of simulated LCP), on top of a poster budget that is already
+tight: with *no* JavaScript at all the figure is 2.71s, leaving under 300ms of headroom.
+
+Two things are worth separating:
+
+- **Real throttled browser** (Edge, 390×844 at DPR 2, 1.6Mbps, 150ms RTT, 4x CPU): poster LCP
+  **2.55s**, which meets the gate.
+- **Lighthouse** reports 3.69–3.76s. Lighthouse does not measure that number; it observes an
+  unthrottled load (observed LCP 153ms) and re-times it through the Lantern simulator. The
+  difference between 2.55s and 3.7s is Lantern's CPU model, not bytes on the wire.
+
+Deferring the video load is already in place and is what took mobile from 80 to 89: the source is
+attached only after `load` and on an idle callback, and connections reporting `saveData` or 2g/3g
+never fetch it at all.
+
+### The fix, which needs a decision
+
+The one change that would close the gap is **a smaller mobile poster**: at 390px CSS width the
+browser needs roughly 780px of pixels, not 1080px. Re-encoding `hero-poster-mobile.jpg` at ~780px
+wide would take it from 128KB to roughly 45KB and bring LCP to about 2.2–2.4s in Lighthouse, with
+headroom to spare.
+
+This has not been done, because the instruction was explicit: *"All four files are already encoded and
+compressed for web. Do not re-encode, resize or regenerate them."* It needs sign-off, and it would
+mean a fifth file (a smaller portrait poster) rather than altering any of the four supplied.
+
+The alternative — cutting JavaScript — is worth less than it looks: perfect hydration still lands at
+roughly 2.9–3.0s, and the brief asks for more motion on this page, not less.

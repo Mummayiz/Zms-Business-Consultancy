@@ -1,38 +1,13 @@
 /*
- * Scroll and pointer tokens for the depth layer.
+ * Scroll tokens for the deck's scroll-linked sequences.
  *
- * These deliberately exceed the master brief's restraint caps (§30's ≤16px and
- * "no excessive parallax"): the Motion & Depth Upgrade supersedes them, because
- * at brief-level values the depth read as nothing at all. The deeper the plane,
- * the less it moves.
+ * The hero parallax planes and pointer-shift tokens were removed with the deck
+ * rebuild: the hero is a video now. They remain in git history (commit
+ * 7018980) if that direction is ever revisited.
  */
 
-/** Vertical travel over the hero's scroll-out, desktop. */
-export const parallaxDesktop = {
-  photo: 40,
-  glow: -70,
-  lines: 120,
-  depth: 180,
-} as const;
-
-/** Phones: scroll only, never pointer, but still clearly moving. */
-export const parallaxMobile = {
-  photo: 20,
-  glow: -34,
-  lines: 58,
-  depth: 88,
-} as const;
-
-/** Horizontal counter-shift in response to the pointer, desktop only. */
-export const pointerShift = {
-  photo: 10,
-  glow: 16,
-  lines: 22,
-  depth: 30,
-} as const;
-
-/** Hero progress: 0 at rest, 1 when the hero has scrolled fully out. */
-export const heroOffset = ["start start", "end start"] as const;
+/** Spring used to smooth pointer tracking on navy surfaces. */
+export const pointerSpring = { stiffness: 55, damping: 22, mass: 0.6 } as const;
 
 /**
  * Section progress: 0 as the section's top enters the bottom of the viewport,
@@ -40,13 +15,9 @@ export const heroOffset = ["start start", "end start"] as const;
  *
  * The window deliberately closes early. Sequences scrub both ways, so a
  * section that is on screen while the page is at rest must already be fully
- * built — otherwise its text sits half-faded, which fails contrast. That is
- * exactly what happened on /services, where the grid sits high on the page.
+ * built — otherwise its text sits half-faded, which fails contrast.
  */
 export const sceneOffset = ["start 100%", "start 70%"] as const;
-
-/** Spring used to smooth pointer tracking. */
-export const pointerSpring = { stiffness: 55, damping: 22, mass: 0.6 } as const;
 
 /** Sub-range for the nth item in a staggered scroll sequence. */
 export function stagger(index: number, step = 0.18, length = 0.5): [number, number] {

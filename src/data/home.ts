@@ -1,30 +1,10 @@
 import type { ProcessStep } from "@/components/services/ProcessSteps";
 
-export const hero = {
-  label: "Abu Dhabi",
-  title: "Clear direction for growing businesses",
-  text: "Management, marketing and project consultancy that turns ambition into a practical, measurable plan.",
-  primary: { label: "Book a consultation", href: "/contact" },
-  secondary: { label: "Our services", href: "/services" },
-};
-
-export const intro = {
-  label: "About ZMS",
-  title: "More than consulting. A stronger tomorrow.",
-  paragraphs: [
-    "ZMS Business Management Consultancy is an Abu Dhabi consultancy that helps organisations run with more structure, reach the right customers and keep their projects under control.",
-    "We bring professional management practice and strategic thinking to each engagement, and turn them into practical recommendations your team can act on. The work starts with your business and your goals, and aims at progress that lasts.",
-  ],
-  link: { label: "More about ZMS", href: "/about" },
-};
-
-export const servicesSection = {
-  label: "Services",
-  title: "Business management consultancy in Abu Dhabi",
-  intro:
-    "Three focused services for organisations in Abu Dhabi and across the UAE, each built on structure, evidence and a clear plan.",
-  linkLabel: "Explore the service",
-};
+/*
+ * Home hero, intro and services copy now lives in `data/deck.ts`, restructured
+ * for the seven-slide deck. What remains here is still shared: the signature
+ * pillars, the four stages, the Why ZMS points and the CTA band.
+ */
 
 export const signature = {
   label: "The ZMS idea",

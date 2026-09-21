@@ -213,22 +213,35 @@
   will-change: transform;
 }
 
-/* ---------- Depth layer ---------- */
-/* A very slow drift, so the bars breathe rather than animate. */
-@keyframes depth-drift {
-  0% {
-    transform: translate3d(0, 0, var(--depth-z, 0)) rotate(0deg);
+/* ---------- Deck ---------- */
+/* Scroll cue: a slow, deliberate drift, never a bounce */
+@keyframes deck-cue {
+  0%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.55;
   }
   50% {
-    transform: translate3d(0, -14px, var(--depth-z, 0)) rotate(0.35deg);
-  }
-  100% {
-    transform: translate3d(0, 0, var(--depth-z, 0)) rotate(0deg);
+    transform: translateY(7px);
+    opacity: 1;
   }
 }
-.depth-bar {
-  animation: depth-drift 42s var(--motion-ease, ease-in-out) infinite;
-  will-change: transform;
+.deck-cue {
+  display: inline-block;
+  animation: deck-cue 2.6s var(--ease-zms) infinite;
+}
+
+/*
+ * Deck chrome stands down while the tear gate is up. The gate's torn edge
+ * leaves a sliver of the left uncovered by design, which was enough to show
+ * the slide counter through it. TearGate sets the flag.
+ */
+.deck-chrome {
+  transition: opacity 500ms var(--ease-zms);
+}
+[data-gate="open"] .deck-chrome {
+  opacity: 0;
+  pointer-events: none;
 }
 
 /* ---------- Button sheen ---------- */
@@ -259,7 +272,7 @@
   :root:not([data-force-motion]) .hero-rule,
   :root:not([data-force-motion]) .hero-step,
   :root:not([data-force-motion]) .hero-mask > *,
-  :root:not([data-force-motion]) .depth-bar {
+  :root:not([data-force-motion]) .deck-cue {
     animation: none !important;
   }
   /* No pointer sheen and no button sweep */

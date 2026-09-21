@@ -151,8 +151,12 @@ docs            accessibility audit and performance records
 ## Accessibility and performance
 
 Audit records: `docs/accessibility-audit.md` and `docs/performance.md`. In short: no axe violations
-across all pages and interactive states, desktop Lighthouse 100, mobile 84–88, CLS 0. Both documents
+across all pages and interactive states, desktop Lighthouse 100, mobile 84–89, CLS 0. Both documents
 list the open items and the changes that were measured and deliberately rejected.
+
+`docs/home-deck.md` covers the Home deck: what is on each slide, the accessibility work on the tear
+gate and the video hero, and the three points where the build departs from its brief. Its mobile
+poster LCP is the one open performance item, with the measurements in `docs/performance.md`.
 
 ## Before launch
 

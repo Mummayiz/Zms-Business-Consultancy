@@ -8,14 +8,13 @@
  * All of these are additionally disabled at runtime when the visitor prefers
  * reduced motion, and the pointer-driven ones only run on hover-capable
  * desktop pointers.
+ *
+ * `heroParallax` and `depthLayer` were retired with the deck rebuild — the
+ * hero video replaces them. See commit 7018980 for that work.
  */
 export const features = {
-  /** Multi-plane parallax in the hero (photo, glow, hairlines, foreground bars). */
-  heroParallax: true,
-  /** Scroll-linked build sequences for services, signature and the process bars. */
+  /** Scroll-linked build sequences for the deck slides and the process bars. */
   scrollScenes: true,
-  /** CSS 3D architectural bars behind the hero headline. */
-  depthLayer: true,
   /** Gold sheen that follows the pointer across navy surfaces. */
   pointerLight: true,
   /** Fine noise texture over navy surfaces. */
