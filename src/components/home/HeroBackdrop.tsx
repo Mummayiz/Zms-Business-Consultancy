@@ -49,6 +49,7 @@ export function HeroBackdrop({ image }: { image: StaticImageData }) {
   const glowX = useTransform(pointerX, swing, shift(pointerShift.glow));
   const linesY = useTransform(scrollYProgress, scroll, [0, off(travel.lines)]);
   const linesX = useTransform(pointerX, swing, shift(pointerShift.lines));
+  const depthY = useTransform(scrollYProgress, scroll, [0, off(travel.depth)]);
 
   return (
     <div ref={ref} className="absolute inset-0 -z-10 overflow-hidden">
@@ -69,7 +70,9 @@ export function HeroBackdrop({ image }: { image: StaticImageData }) {
       </m.div>
 
       {/* Plane 4 — foreground depth bars, behind the glow so the headline stays legible */}
-      {features.depthLayer && pointer && <DepthBars pointerX={pointerX} pointerY={pointerY} />}
+      {features.depthLayer && pointer && (
+        <DepthBars pointerX={pointerX} pointerY={pointerY} scrollY={depthY} />
+      )}
 
       {/* Plane 2 — the ivory glow, moving against the photo */}
       <m.div

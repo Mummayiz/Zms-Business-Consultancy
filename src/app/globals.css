@@ -185,6 +185,34 @@
   animation-delay: calc(var(--i, 0) * 0.12s + 0.3s);
 }
 
+/*
+ * Headline: a masked rise.
+ *
+ * The reveal is a transform inside an overflow-hidden wrapper, not an animated
+ * clip-path: clip-path repaints the whole headline every frame, which cost
+ * ~300ms of blocking time on a throttled phone. Transforms stay on the
+ * compositor.
+ */
+.hero-mask {
+  overflow: hidden;
+  /* room for descenders, without adding layout height */
+  padding-bottom: 0.12em;
+  margin-bottom: -0.12em;
+}
+@keyframes hero-mask-rise {
+  from {
+    transform: translateY(105%);
+  }
+  to {
+    transform: none;
+  }
+}
+.hero-mask > * {
+  animation: hero-mask-rise 1s var(--motion-ease) both;
+  animation-delay: 0.42s;
+  will-change: transform;
+}
+
 /* ---------- Depth layer ---------- */
 /* A very slow drift, so the bars breathe rather than animate. */
 @keyframes depth-drift {
@@ -211,8 +239,8 @@
     inset: 0;
     z-index: -1;
     transform: translateX(-120%) skewX(-12deg);
-    background: linear-gradient(90deg, transparent, rgb(200 154 61 / 0.35), transparent);
-    transition: transform 0.55s var(--ease-zms);
+    background: linear-gradient(90deg, transparent, rgb(200 154 61 / 0.7), transparent);
+    transition: transform 0.7s var(--ease-zms);
   }
   .btn-sheen:hover::after {
     transform: translateX(120%) skewX(-12deg);
@@ -230,6 +258,7 @@
   :root:not([data-force-motion]) .hero-line,
   :root:not([data-force-motion]) .hero-rule,
   :root:not([data-force-motion]) .hero-step,
+  :root:not([data-force-motion]) .hero-mask > *,
   :root:not([data-force-motion]) .depth-bar {
     animation: none !important;
   }

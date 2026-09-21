@@ -1,10 +1,9 @@
-"use client";
+﻿"use client";
 
 import { useRef, type ReactNode } from "react";
 import { m, useScroll, useTransform, type MotionStyle } from "motion/react";
 import { features } from "@/config/features";
 import { sceneOffset, stagger } from "@/lib/scroll";
-import { useLatched } from "@/components/motion/ScrollScene";
 import { useSceneMotion } from "@/components/motion/useSceneMotion";
 import { Reveal } from "@/components/motion/Reveal";
 
@@ -35,19 +34,20 @@ export function ServiceColumn({
 
   const { scrollYProgress } = useScroll({
     target: ref,
-    offset: sceneOffset as unknown as ["start 85%", "start 35%"],
+    offset: sceneOffset as unknown as ["start 100%", "start 70%"],
   });
-  const progress = useLatched(scrollYProgress);
+  const progress = scrollYProgress;
 
-  const ruleRange = stagger(index, 0.1, 0.4);
+  // A column at a time: rule extends, then its content steps in behind it.
+  const ruleRange = stagger(index, 0.18, 0.34);
   const contentRange: [number, number] = [
-    Math.min(ruleRange[0] + 0.15, 1),
-    Math.min(ruleRange[1] + 0.25, 1),
+    Math.min(ruleRange[0] + 0.12, 1),
+    Math.min(ruleRange[1] + 0.2, 1),
   ];
 
   const ruleScale = useTransform(progress, ruleRange, [0, 1], { clamp: true });
   const opacity = useTransform(progress, contentRange, [0, 1], { clamp: true });
-  const y = useTransform(progress, contentRange, [12, 0], { clamp: true });
+  const y = useTransform(progress, contentRange, [56, 0], { clamp: true });
 
   return (
     <div ref={ref} className={className}>

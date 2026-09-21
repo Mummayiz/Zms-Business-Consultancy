@@ -1,11 +1,10 @@
-"use client";
+﻿"use client";
 
 import { useRef } from "react";
 import { m, useScroll, useTransform, type MotionValue } from "motion/react";
 import { fadeUp, staggerChildren, viewport } from "@/lib/motion";
 import { sceneOffset, stagger } from "@/lib/scroll";
 import { features } from "@/config/features";
-import { useLatched } from "@/components/motion/ScrollScene";
 import { useSceneMotion } from "@/components/motion/useSceneMotion";
 import { ArchitecturalBars } from "@/components/brand/ArchitecturalBars";
 import { Orbit } from "@/components/brand/Orbit";
@@ -22,7 +21,7 @@ const TEXT_DELAY = ORBIT_DELAY + 0.35;
  * Four rising architectural bars (last in gold) connected by the orbit,
  * followed by the stage descriptions. Not a horizontal timeline.
  *
- * Bars grow with the scroll where motion is allowed — the one scroll-linked
+ * Bars grow with the scroll where motion is allowed â€” the one scroll-linked
  * sequence that also runs on phones, since it is only five transforms.
  */
 export function ProcessSteps({
@@ -34,15 +33,22 @@ export function ProcessSteps({
   orbit?: boolean;
 }) {
   const ref = useRef<HTMLDivElement>(null);
-  const { motion: motionOn } = useSceneMotion();
-  const scrollLinked = features.scrollScenes && motionOn;
+  const { pointer } = useSceneMotion();
+  /*
+   * Desktop only. Scroll-linked opacity means the text is mid-fade whenever the
+   * section is mid-window — and on a phone this section can sit that way while
+   * the page is at rest, which fails contrast. Phones get the one-shot reveal
+   * instead: it animates on entry and always finishes.
+   */
+  const scrollLinked = features.scrollScenes && pointer;
 
   const { scrollYProgress } = useScroll({
     target: ref,
-    offset: sceneOffset as unknown as ["start 85%", "start 35%"],
+    offset: sceneOffset as unknown as ["start 100%", "start 70%"],
   });
-  const progress = useLatched(scrollYProgress);
-  const orbitDraw = useTransform(progress, [0.45, 0.85], [0, 1], { clamp: true });
+  const progress = scrollYProgress;
+  // Bars finish, then the curve traces through them.
+  const orbitDraw = useTransform(progress, [0.55, 0.85], [0, 1], { clamp: true });
 
   return (
     <m.div
@@ -102,12 +108,11 @@ function ScrollStep({
   index: number;
   step: ProcessStep;
 }) {
-  // Stage text follows the orbit and is finished by ~0.93, so a fast scroll
-  // never leaves it mid-fade.
-  const range = stagger(index, 0.07, 0.22);
-  const shifted: [number, number] = [0.5 + range[0], Math.min(0.5 + range[1], 1)];
+  // Stage text follows the curve, one stage at a time, finished by ~0.97.
+  const range = stagger(index, 0.08, 0.22);
+  const shifted: [number, number] = [0.66 + range[0], Math.min(0.66 + range[1], 1)];
   const opacity = useTransform(progress, shifted, [0, 1], { clamp: true });
-  const y = useTransform(progress, shifted, [12, 0], { clamp: true });
+  const y = useTransform(progress, shifted, [40, 0], { clamp: true });
 
   return (
     <m.li data-motion style={{ opacity, y }}>

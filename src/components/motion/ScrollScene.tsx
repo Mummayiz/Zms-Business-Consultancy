@@ -1,6 +1,6 @@
 "use client";
 
-import { useMotionValue, useMotionValueEvent, useTransform, type MotionValue } from "motion/react";
+import { useTransform, type MotionValue } from "motion/react";
 
 /*
  * Helpers for scroll-linked sequences.
@@ -10,26 +10,13 @@ import { useMotionValue, useMotionValueEvent, useTransform, type MotionValue } f
  * fallback branch — or Motion throws "Target ref is defined but not hydrated".
  * Each scene therefore owns its own ref and attaches it unconditionally; this
  * module deliberately does not hand out refs for callers to attach.
- */
-
-/**
- * A progress value that only ever moves forwards.
  *
- * Scroll-linked values reverse by nature; the brief asks for sequences that
- * play once. This holds each sequence at its furthest point, so scrolling back
- * up leaves the section built rather than replaying it.
+ * Sequences scrub in both directions: scrolling back up plays them in reverse.
+ * (An earlier version latched progress so each sequence played once; that made
+ * the motion invisible on the way back, so it was removed.)
  */
-export function useLatched(source: MotionValue<number>): MotionValue<number> {
-  const latched = useMotionValue(source.get());
 
-  useMotionValueEvent(source, "change", (value) => {
-    if (value > latched.get()) latched.set(value);
-  });
-
-  return latched;
-}
-
-/** Latched progress mapped into a range, clamped at both ends. */
+/** Scroll progress mapped into a range, clamped at both ends. */
 export function useScenePart(
   progress: MotionValue<number>,
   input: [number, number],

@@ -58,7 +58,7 @@ export function PointerLight({ className = "" }: { className?: string }) {
       } ${className}`}
       style={{
         background:
-          "radial-gradient(520px circle at var(--px, 50%) var(--py, 40%), rgb(200 154 61 / 0.08), rgb(200 154 61 / 0.03) 38%, transparent 68%)",
+          "radial-gradient(620px circle at var(--px, 50%) var(--py, 40%), rgb(200 154 61 / 0.18), rgb(200 154 61 / 0.07) 40%, transparent 70%)",
       }}
     />
   );

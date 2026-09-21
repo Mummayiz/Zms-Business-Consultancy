@@ -92,17 +92,63 @@ competing with it, and the hero is composed to look complete without it.
 - **Button sheen**: a single gold sweep on hover, 0.55s, on hover-capable pointers only.
 - **Easing**: the shared `--ease-zms` curve now also drives the sheen and the depth drift.
 
+## Amplification pass (21 September 2026)
+
+The first build was technically correct and visually invisible. On the client's instruction the
+master brief's restraint caps (§30's ≤16px, "no excessive parallax") are overridden for this layer.
+
+| | First build | Amplified |
+|---|---|---|
+| Play-once latch | held | **removed** — scenes scrub both ways and reverse on the way up |
+| Photo / glow / hairlines / depth travel | 12 / −24 / 40 / — px | **40 / −70 / 120 / 180 px** |
+| Mobile travel | 6 / −10 / 16 / 24 px | **20 / −34 / 58 / 88 px** |
+| Pointer counter-shift | ±3–12px | **±10–30px** |
+| Depth bars | 6, opacity 7–10%, tilt ±3.5° | **12, opacity 18–26%, tilt ±8°, z −60 to −560** |
+| Reveal distance | 12px | **48px** (hero entrance 28px) |
+| Service column stagger | 0.10 step | **0.18 step**, content travel 56px |
+| Signature divergence | ±18 / ±42px | **±60 / ±140px** |
+| Pointer sheen | 8% gold | **18% gold**, 620px radius |
+| Button sheen | 35% gold | **70% gold**, 0.7s sweep |
+| Hero headline | 12px fade | **masked rise** from behind its own baseline, 1s |
+
+### Two problems the amplification exposed
+
+1. **An animated `clip-path` headline reveal cost ~300ms of blocking time** on a throttled phone,
+   because it repaints the whole headline every frame. Rebuilt as a `translateY` inside an
+   `overflow: hidden` wrapper: identical masked effect, compositor only.
+2. **Scroll-linked opacity leaves text mid-fade whenever a section sits mid-window** — and with the
+   latch gone, that includes sections resting on screen. axe caught 2.04:1 on the `/services`
+   columns and 1.13:1 on the `/approach` stage text. Two changes fixed it:
+   - the scene window now closes early (`start 100%` → `start 70%`), so anything on screen at rest
+     is fully built;
+   - the process stage text is scroll-linked on desktop only. Phones keep the one-shot reveal, which
+     animates on entry and always finishes.
+
+Also fixed: `features.buttonSheen` was never actually consulted — the class was applied
+unconditionally. Every flag now genuinely switches its layer off.
+
+### Performance attribution
+
+The amplified build first measured mobile 80–88, which looked like a regression. Isolating each flag
+on the same build and machine showed otherwise: parallax only 92–93, scroll scenes only 92–93, both
+together 92–93, grain only 93, all flags off 93, **all flags on 92–93**. The dip was machine load
+during the earlier run, not the motion layer. The `clip-path` fix was kept anyway — it is
+measurably cheaper and no worse.
+
 ## Measurements (local production build, median of three runs)
 
-| | Before | After |
+| | No motion layer | Amplified layer |
 |---|---|---|
-| Mobile Home | 92–93, LCP 3.21–3.31s, TBT 32–40ms | **92**, LCP 3.35s, TBT 30–45ms |
-| Mobile Contact | 95 | **95–98**, LCP 2.34–2.97s |
-| Desktop Home | 100, LCP 0.70–0.73s | **100**, LCP 0.72s |
+| Mobile Home | 92–93, LCP 3.21–3.31s, TBT 32–44ms | **92** (88–93), LCP 3.14–3.46s, TBT 85–200ms |
+| Mobile Contact | 95 | **98** |
+| Desktop Home | 100, LCP 0.70–0.73s | **100**, LCP 0.73s, TBT 0ms |
 | Desktop Contact | 100 | **100** |
 | CLS | 0 | **0** |
 | JS (Home) | 202KB | **219KB** (+17KB) |
 | axe violations | 0 | **0** |
+
+Gates: desktop ≥95 ✓ (100), mobile ≥85 ✓ (median 92), CLS 0 ✓, mobile LCP within noise of the
+3.2–3.3s local baseline ✓.
 
 Against the stated gates: desktop ≥95 ✓, mobile ≥85 ✓, CLS 0 ✓, added JS ≤12KB ✗ (17KB, see below).
 

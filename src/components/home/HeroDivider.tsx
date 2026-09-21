@@ -2,7 +2,6 @@
 
 import { useScroll, useTransform } from "motion/react";
 import { features } from "@/config/features";
-import { useLatched } from "@/components/motion/ScrollScene";
 import { useSceneMotion } from "@/components/motion/useSceneMotion";
 import { Orbit } from "@/components/brand/Orbit";
 
@@ -18,12 +17,11 @@ export function HeroDivider() {
   const { motion: motionOn } = useSceneMotion();
   const { scrollY } = useScroll();
 
-  // Fully drawn after scrolling half a viewport.
-  const drawn = useTransform(scrollY, (value) => {
+  // Fully drawn after scrolling half a viewport, and it un-draws on the way back.
+  const progress = useTransform(scrollY, (value) => {
     const span = typeof window === "undefined" ? 400 : window.innerHeight * 0.5;
     return Math.min(Math.max(value / span, 0), 1);
   });
-  const progress = useLatched(drawn);
 
   const scrollLinked = features.scrollScenes && motionOn;
 

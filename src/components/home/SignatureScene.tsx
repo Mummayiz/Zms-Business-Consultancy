@@ -1,17 +1,16 @@
-"use client";
+﻿"use client";
 
 import { useRef, type ReactNode } from "react";
 import { m, useScroll, useTransform } from "motion/react";
 import { features } from "@/config/features";
 import { sceneOffset } from "@/lib/scroll";
-import { useLatched } from "@/components/motion/ScrollScene";
 import { useSceneMotion } from "@/components/motion/useSceneMotion";
 import { Orbit } from "@/components/brand/Orbit";
 
 /**
  * Signature section depth: the showcase image travels slower than the text as
  * the section passes, and the orbit draws between them on scroll.
- * Desktop only — on phones the section keeps its one-shot reveals.
+ * Desktop only â€” on phones the section keeps its one-shot reveals.
  */
 export function SignatureScene({
   image,
@@ -20,7 +19,7 @@ export function SignatureScene({
   orbitClassName,
 }: {
   image: ReactNode;
-  /** Label and headline — the orbit is drawn directly beneath these. */
+  /** Label and headline â€” the orbit is drawn directly beneath these. */
   textTop: ReactNode;
   /** Intro and pillars, below the orbit. */
   textBottom: ReactNode;
@@ -32,14 +31,14 @@ export function SignatureScene({
 
   // Section travel, not hero travel: measured across the whole section pass.
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
-  const imageY = useTransform(scrollYProgress, [0, 1], [18, -18]);
-  const textY = useTransform(scrollYProgress, [0, 1], [42, -42]);
+  const imageY = useTransform(scrollYProgress, [0, 1], [60, -60]);
+  const textY = useTransform(scrollYProgress, [0, 1], [140, -140]);
 
   const { scrollYProgress: sceneProgress } = useScroll({
     target: ref,
-    offset: sceneOffset as unknown as ["start 85%", "start 35%"],
+    offset: sceneOffset as unknown as ["start 100%", "start 70%"],
   });
-  const orbitDraw = useLatched(useTransform(sceneProgress, [0.15, 0.8], [0, 1], { clamp: true }));
+  const orbitDraw = useTransform(sceneProgress, [0.15, 0.8], [0, 1], { clamp: true });
 
   const orbit = (
     <Orbit

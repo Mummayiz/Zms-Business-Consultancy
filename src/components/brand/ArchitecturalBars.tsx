@@ -77,7 +77,8 @@ function ScrollBar({
   className: string;
   colour: string;
 }) {
-  const scaleY = useTransform(progress, stagger(index, 0.1, 0.45), [0, 1], { clamp: true });
+  // One bar at a time, each taking its time: the whole run lands by ~0.6.
+  const scaleY = useTransform(progress, stagger(index, 0.12, 0.26), [0, 1], { clamp: true });
 
   return (
     <m.div data-motion className={className} style={{ height: `${height}%`, transformOrigin: "bottom", scaleY }}>

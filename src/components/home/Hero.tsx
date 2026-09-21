@@ -33,9 +33,11 @@ export function Hero() {
           <span className="rule-taper hero-rule origin-left" aria-hidden />
         </p>
 
-        <h1 id="hero-title" className="type-hero hero-step mt-7 max-w-[20ch] text-navy" style={step(1)}>
-          {hero.title}
-        </h1>
+        <div className="hero-mask mt-7 max-w-[20ch]">
+          <h1 id="hero-title" className="type-hero text-navy">
+            {hero.title}
+          </h1>
+        </div>
 
         <p className="type-lead hero-step mt-6 max-w-[54ch] text-charcoal" style={step(2)}>
           {hero.text}

@@ -18,8 +18,16 @@ export const duration = {
   background: 1.4,
 } as const;
 
-/** Maximum vertical travel for reveals, in px (brief: ≤16px). */
-export const travel = 12;
+/**
+ * Vertical travel for reveals, in px.
+ *
+ * The master brief caps this at 16px; the Motion & Depth Upgrade raises it,
+ * because at 16px a reveal reads as a flicker rather than a build.
+ */
+export const travel = 48;
+
+/** Shorter travel for the hero's own entrance, which runs in CSS. */
+export const heroTravel = 28;
 
 export const stagger = 0.08;
 
@@ -94,5 +102,5 @@ export const heroMotionVars = {
   "--motion-rise": `${duration.rise}s`,
   "--motion-bg": `${duration.background}s`,
   "--motion-stagger": `${stagger}s`,
-  "--motion-travel": `${travel}px`,
+  "--motion-travel": `${heroTravel}px`,
 } as CSSProperties;
