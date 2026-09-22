@@ -146,30 +146,78 @@ The wash is now `.hero-glow`, rendered inside the hero's text column and sized t
 pool behind the headline rather than a full-width wash. The full-bleed layer that remains only takes
 the glare off the footage (0.14–0.34 ivory, down from 0.82–0.95).
 
-Two details matter in the gradient:
+### Making it read as haze, not as an object
 
-- **The ellipse is inscribed in its box** — `50% 50% at 50% 50%`. A gradient wider than the element
-  is still opaque where the element ends, which drew a visible rectangle around the headline. The
-  generous negative inset is what makes an inscribed ellipse work: the box is far larger than the
-  text, so the text sits in the middle three-quarters where the wash is at full strength and the
-  falloff happens in the empty margin.
-- **The plateau runs well past the text.** Contrast here is measured against the darkest pixel behind
-  the headline and the footage is moving, so a shorter plateau measured 10:1 at one width and 3.2:1
-  at another purely on which frame was showing.
+The first attempt fixed visibility but produced a distinctly bounded ellipse — you could see where it
+started and stopped, so it read as a spotlight sitting on the footage.
 
-Measured per width — worst case over four frames, with the share of the hero still reading as video
-rather than flat ivory:
+The cause was not strength but falloff. A five-stop ramp ending at a fixed ellipse still has a large
+slope where it stops, and a discontinuity in the *rate* of change is what the eye picks up as an
+edge. To measure that rather than guess at it, `glowedge.mjs` replaces the footage with flat grey and
+hides the copy, so the only thing varying across the frame is the wash, then reads the brightness
+profile along the horizontal and vertical centrelines and differentiates it. The second difference is
+the number that matters: a haze varies smoothly, a bounded shape spikes where it terminates.
+
+The old ramp fell from 20% of peak to 2% inside a single pixel:
+
+```
+768px vertical profile %:  0 0 0 0 0 0 56 94 98 ... 96 73 0 0 0      maxKink 1.06
+```
+
+The curve now runs through 26 stops on an eased profile: a plateau near 0.97 over the copy, half
+strength by 70% of the radius, 4.6% by 95%, and a slope already near zero before it ends.
+
+```
+768px vertical profile %:  0 0 0 5 22 45 72 87 94 96 ... 90 78 53 31 10   maxKink 0.40
+1440px horizontal      %:  69 83 92 96 98 99 100 ... 90 80 61 44 23 10 3 2 1 1
+```
+
+| | before | after |
+|---|---|---|
+| worst second difference (the edge signal) | 1.06 | **0.44** |
+| worst max slope | 2.64 | **1.16** |
+| 1440px horizontal tail, 20% → 2% of peak | 196px | **166px** |
+
+The curve is derived, not hand-tuned. It is the composite of three concentric layers, each carrying
+the same eased tail, flattened into one gradient:
+
+```
+radius scale   peak alpha
+0.70           0.88   core, over the copy
+0.88           0.60   mid
+1.00           0.34   halo, the long faint tail
+
+tail (fraction of each layer's own radius → fraction of its peak)
+0.00→1.00  0.32→0.98  0.50→0.92  0.62→0.83  0.72→0.70  0.80→0.55
+0.86→0.40  0.91→0.26  0.945→0.15 0.97→0.075 0.987→0.03 1.00→0
+composite(r) = 1 − Π (1 − peak × tail(r / scale))
+```
+
+Those numbers are the whole specification; the stop list in `globals.css` is the arithmetic done
+once. Re-deriving it by hand is a few lines in any language, so the throwaway generator is not kept
+in the repo.
+
+Flattening matters for more than tidiness. Left as three stacked radials the visual result was
+identical, but the hero's playing video forced all three to repaint together and mobile TBT went from
+92ms to ~890ms. One gradient paints the same picture. Verified by interleaving the one-gradient and
+eased builds in a single machine state: TBT 501/757ms against 522/409ms — indistinguishable, so the
+26 stops cost nothing measurable.
+
+Measured per width after the change — worst case over four video frames:
 
 | width | video visible | headline | lead |
 |---|---|---|---|
-| 375px | 61% | 8.77:1 | 11.96:1 |
-| 390px | 62% | 8.83:1 | 11.95:1 |
-| 768px | 65% | 13.06:1 | 12.64:1 |
-| 1024px | 59% | 7.88:1 | 12.40:1 |
-| 1440px | 73% | 11.96:1 | 12.63:1 |
-| 1920px | 83% | 7.35:1 | 12.53:1 |
+| 375px | 72% | 7.83:1 | 9.31:1 |
+| 390px | 73% | 9.39:1 | 9.12:1 |
+| 768px | 72% | 8.03:1 | 11.82:1 |
+| 1024px | 72% | 8.49:1 | 11.27:1 |
+| 1440px | 81% | 10.10:1 | 10.38:1 |
+| 1920px | 87% | 8.26:1 | 10.09:1 |
 
-Every figure clears AA with room to spare — 3:1 for the headline at that size, 4.5:1 for the lead.
+Both goals held while the edge was removed: visibility rose from 59–83% to 72–87%, and the headline
+contrast floor from 7.35:1 to 7.83:1. Every figure clears AA with room to spare — 3:1 for the
+headline at that size, 4.5:1 for the lead.
+
 Before/after screenshots at all six widths are in `review-shots/hero-before` and
 `review-shots/hero-after`.
 
