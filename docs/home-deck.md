@@ -121,10 +121,12 @@ third of the width tears it open.
 axe-core 4.13, WCAG 2.0/2.1 A and AA, at 390px and 1440px, with the gate up and dismissed:
 **0 violations** in all four states, one `<h1>` throughout.
 
-The hero needs an ivory wash to get there. Against the supplied footage, navy text measures 2.56:1
-bare. That wash was a full-bleed scrim to begin with, which is what made the video invisible on
-narrower screens; it is now scaled to the text block, and the per-width figures are in
-"The hero glow, rescaled to the text" below.
+**That clean axe run says nothing about the hero.** Over video and gradients axe cannot resolve a
+background, so the headline and lead land in its *incomplete* bucket — flagged for a human, neither
+passed nor failed. Their contrast is measured separately and by hand: bare, navy on the supplied
+footage is 2.56:1, and what carries it past AA is the ivory halo on the glyphs. The method and the
+per-width figures are in "Measuring haloed text" below. Treat axe as covering the other ten pages
+and every non-hero surface, not this one.
 
 Removing the chrome took the page's only decorative text with it. While it existed it had to meet
 contrast like anything else, which is why the numerals were raised to `navy/70` on light slides and
@@ -218,8 +220,72 @@ Both goals held while the edge was removed: visibility rose from 59–83% to 72�
 contrast floor from 7.35:1 to 7.83:1. Every figure clears AA with room to spare — 3:1 for the
 headline at that size, 4.5:1 for the lead.
 
-Before/after screenshots at all six widths are in `review-shots/hero-before` and
-`review-shots/hero-after`.
+### Halving the wash, and moving legibility onto the glyphs
+
+On a real phone the wash was still veiling the picture: a ~0.97 peak over the
+centre of the frame left the footage reading as a pale blur, even with the edge
+gone. The contrast numbers were never the constraint — 7.8–9.4:1 against a
+4.5:1 requirement is a lot of headroom to be spending on a veil.
+
+So the wash peak was cut to **0.46**, less than half, and the full-bleed layer
+with it (0.34–0.14 down to 0.20–0.06). The falloff shape is untouched.
+
+What replaces the lost legibility is `.hero-ink`: an ivory halo on the glyphs
+themselves, which is how broadcast titling keeps text readable over picture. A
+wash has to dim the whole frame to guarantee contrast at the one place it is
+needed — behind the letterforms — so it trades the footage away. A halo puts the
+ivory exactly there and nowhere else, and costs nothing visually where the
+background is already light, because ivory on ivory is invisible.
+
+Radii are in em so one declaration serves every size. Body copy gets a second,
+proportionally wider class: strokes at 17px are thin enough that an em-scaled
+halo disappears into them, and the lead sits over the busiest part of the
+footage — a tower facade of horizontal mullions at roughly its own stroke
+weight.
+
+The hero's secondary button needed the same thinking. `secondary` is transparent,
+which was fine under a heavy wash; with the wash cut back its navy label sat
+straight on moving video. It now uses a `secondaryOnMedia` variant that brings
+its own ivory ground. Passing `bg-ivory/90` through `className` does not work —
+it and the variant's `bg-transparent` are the same property, and Tailwind
+resolves that by stylesheet order, not by the order in the attribute.
+
+#### Measuring haloed text
+
+The old measurement — hide the text, sample what is behind it — describes a
+large-area wash but not a halo: it reports the footage, which is no longer what
+sits against the letterforms. Note also that axe is no help here; over video and
+gradients it cannot resolve a background at all, so the hero headline lands in
+its *incomplete* bucket rather than its pass bucket, and a clean axe run says
+nothing about this.
+
+`inkcheck.mjs` measures the halo directly: shoot the region twice with the text
+shown and hidden, take the glyph mask from the pixels that darken, take the halo
+ring from nearby pixels that *lighten*, and report the 5th-percentile luminance
+of that ring so a few bright outliers cannot flatter the result.
+
+| width | video visible | headline effective | lead effective | bare background |
+|---|---|---|---|---|
+| 375px | 98% | 6.79:1 | 6.64:1 | 3.9–4.4:1 |
+| 768px | 97% | 8.40:1 | 7.54:1 | 3.1–3.7:1 |
+| 1440px | 97% | 7.26:1 | 6.05:1 | 1.6–3.6:1 |
+
+The bare-background column is the honest caveat: without the halo this copy
+would not meet AA. The halo is load-bearing, not decoration, which is why it
+lives in a documented class rather than an inline flourish.
+
+Video visibility went from 72–87% to **96–98%** — the skyline, the glass facade
+and the water are all identifiable at every width. The edge measurement still
+holds: worst second difference 0.52, worst max slope 1.00, against 1.06 and 2.64
+for the original ramp.
+
+Cost, measured by interleaving both builds in one machine state: performance 90
+against 89–90, TBT 54/73ms against 92/140ms. The halo costs roughly 40–70ms of
+paint on a throttled phone and no score.
+
+Screenshots: `review-shots/hero-before` (original full-bleed scrim),
+`review-shots/hero-after` (rescaled wash), and `review-shots/hero-wash-before`
+/ `review-shots/hero-wash-after` for this change at 375 and 1440.
 
 ## The gate now takes focus as it appears
 

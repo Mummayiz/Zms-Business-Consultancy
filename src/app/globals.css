@@ -215,7 +215,11 @@
   pointer-events: none;
   /*
    * An eased profile with a long, very faint tail — most of the opacity sits
-   * near the text and the last 15% of the radius carries almost none.
+   * near the text and the last 15% of the radius carries almost none. It peaks
+   * at 0.46, less than half what it was: on a real phone a ~0.97 peak veiled
+   * the centre of the frame and the footage read as a pale blur. The legibility
+   * it used to provide now comes from `.hero-ink`, which is tight to the
+   * glyphs, so the picture stays a picture.
    *
    * The five-stop ramp this replaces read as an object rather than atmosphere.
    * Its slope was still large where the gradient stopped, and a discontinuity in
@@ -224,39 +228,39 @@
    * pixel and spiked the second difference to 1.06. Here the slope is already
    * near zero before the gradient ends, so there is no radius to point at.
    *
-   * The curve is the composite of three concentric layers — a core at 0.88 over
-   * the copy, a mid at 0.60, a wide halo at 0.34 — flattened into one gradient
-   * rather than stacked as three. Stacked, the hero's playing video forced all
-   * three to repaint together and mobile TBT went from 92ms to ~890ms. One
-   * gradient paints the same picture. See docs/home-deck.md for the generator.
+   * The curve is the composite of three concentric layers — core, mid and a wide
+   * halo, at 30% of their original peaks — flattened into one gradient rather
+   * than stacked as three. Stacked, the hero's playing video forced all three to
+   * repaint together and mobile TBT went from 92ms to ~890ms. One gradient
+   * paints the same picture. docs/home-deck.md has the layer parameters.
    */
   background: radial-gradient(
     50% 50% at 50% 50%,
-    rgb(251 246 234 / 0.9683) 0%,
-    rgb(251 246 234 / 0.9663) 8%,
-    rgb(251 246 234 / 0.9642) 16%,
-    rgb(251 246 234 / 0.9606) 24%,
-    rgb(251 246 234 / 0.9501) 32%,
-    rgb(251 246 234 / 0.9295) 40%,
-    rgb(251 246 234 / 0.9024) 46%,
-    rgb(251 246 234 / 0.8573) 52%,
-    rgb(251 246 234 / 0.7979) 57%,
-    rgb(251 246 234 / 0.71) 62%,
-    rgb(251 246 234 / 0.6109) 66%,
-    rgb(251 246 234 / 0.4992) 70%,
-    rgb(251 246 234 / 0.4334) 74%,
-    rgb(251 246 234 / 0.3564) 78%,
-    rgb(251 246 234 / 0.2653) 82%,
-    rgb(251 246 234 / 0.1768) 85.5%,
-    rgb(251 246 234 / 0.1122) 88.5%,
-    rgb(251 246 234 / 0.0884) 91%,
-    rgb(251 246 234 / 0.0649) 93.2%,
-    rgb(251 246 234 / 0.0459) 95%,
-    rgb(251 246 234 / 0.0306) 96.5%,
-    rgb(251 246 234 / 0.0192) 97.7%,
-    rgb(251 246 234 / 0.0111) 98.6%,
-    rgb(251 246 234 / 0.0055) 99.3%,
-    rgb(251 246 234 / 0.0024) 99.7%,
+    rgb(251 246 234 / 0.458) 0%,
+    rgb(251 246 234 / 0.4557) 8%,
+    rgb(251 246 234 / 0.4533) 16%,
+    rgb(251 246 234 / 0.4497) 24%,
+    rgb(251 246 234 / 0.4398) 32%,
+    rgb(251 246 234 / 0.4209) 40%,
+    rgb(251 246 234 / 0.3986) 46%,
+    rgb(251 246 234 / 0.3648) 52%,
+    rgb(251 246 234 / 0.3248) 57%,
+    rgb(251 246 234 / 0.2723) 62%,
+    rgb(251 246 234 / 0.2197) 66%,
+    rgb(251 246 234 / 0.1671) 70%,
+    rgb(251 246 234 / 0.1427) 74%,
+    rgb(251 246 234 / 0.1151) 78%,
+    rgb(251 246 234 / 0.0837) 82%,
+    rgb(251 246 234 / 0.0543) 85.5%,
+    rgb(251 246 234 / 0.0337) 88.5%,
+    rgb(251 246 234 / 0.0265) 91%,
+    rgb(251 246 234 / 0.0195) 93.2%,
+    rgb(251 246 234 / 0.0138) 95%,
+    rgb(251 246 234 / 0.0092) 96.5%,
+    rgb(251 246 234 / 0.0058) 97.7%,
+    rgb(251 246 234 / 0.0033) 98.6%,
+    rgb(251 246 234 / 0.0016) 99.3%,
+    rgb(251 246 234 / 0.0007) 99.7%,
     rgb(251 246 234 / 0) 100%
   );
 }
@@ -265,6 +269,41 @@
   .hero-glow {
     inset: -13rem -20rem;
   }
+}
+
+/*
+ * Hero copy over footage: an ivory halo on the glyphs themselves.
+ *
+ * This is the broadcast-titling trick, and it is doing the job a large-area
+ * wash used to. A wash has to veil the whole picture to guarantee contrast at
+ * the one place it is needed — behind the letterforms — so it trades the
+ * footage away for legibility. A halo puts the ivory exactly where the letters
+ * are and nowhere else.
+ *
+ * It costs nothing visually where the background is already light, because
+ * ivory on ivory is invisible; it only reads where the footage goes dark, which
+ * is precisely where the text would otherwise be hard to read.
+ *
+ * Radii are in em so the halo stays proportional: ~3/9/23px behind the 76px
+ * headline, ~0.7/2/5px behind the 17px lead, from one declaration.
+ */
+.hero-ink {
+  text-shadow:
+    0 0 0.04em rgb(251 246 234 / 0.95),
+    0 0 0.12em rgb(251 246 234 / 0.85),
+    0 0 0.3em rgb(251 246 234 / 0.55);
+}
+/*
+ * Body-size copy needs a proportionally wider, denser halo. Strokes at 17px are
+ * thin enough that a halo scaled purely by em all but disappears into them, and
+ * the lead sits over the busiest part of the footage — a tower facade full of
+ * horizontal mullions at roughly its own stroke weight.
+ */
+.hero-ink-sm {
+  text-shadow:
+    0 0 0.09em rgb(251 246 234 / 0.98),
+    0 0 0.24em rgb(251 246 234 / 0.92),
+    0 0 0.55em rgb(251 246 234 / 0.6);
 }
 
 /* ---------- Deck ---------- */

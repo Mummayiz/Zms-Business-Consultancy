@@ -52,7 +52,7 @@ export default function HomePage() {
         overlay={
           <a
             href="#firm"
-            className="type-label absolute inset-x-0 bottom-6 mx-auto flex w-fit items-center gap-3 text-navy lg:bottom-12"
+            className="type-label hero-ink-sm absolute inset-x-0 bottom-6 mx-auto flex w-fit items-center gap-3 text-navy lg:bottom-12"
           >
             {heroSlide.scrollCue}
             <span aria-hidden className="h-px w-12 bg-gold" />
@@ -73,11 +73,18 @@ export default function HomePage() {
             forbids outright. The accent is italic navy here instead.
           */}
           <div className="hero-mask">
-            <DisplayHeading as="h1" id="hero-title" parts={heroSlide.headline} tone="light" focusable />
+            <DisplayHeading
+              as="h1"
+              id="hero-title"
+              parts={heroSlide.headline}
+              tone="light"
+              focusable
+              className="hero-ink"
+            />
           </div>
 
           <p
-            className="type-lead hero-step mt-8 max-w-[52ch] text-charcoal"
+            className="type-lead hero-step hero-ink-sm mt-8 max-w-[52ch] text-charcoal"
             style={{ "--i": 2 } as React.CSSProperties}
           >
             {heroSlide.text}
@@ -87,7 +94,7 @@ export default function HomePage() {
             <ButtonLink href={heroSlide.primary.href} variant="primary">
               {heroSlide.primary.label}
             </ButtonLink>
-            <ButtonLink href={heroSlide.secondary.href} variant="secondary">
+            <ButtonLink href={heroSlide.secondary.href} variant="secondaryOnMedia">
               {heroSlide.secondary.label}
             </ButtonLink>
           </div>

@@ -183,7 +183,7 @@ export function HeroVideo() {
       */}
       <div
         aria-hidden
-        className="absolute inset-0 bg-[linear-gradient(to_bottom,rgb(251_246_234/0.34)_0%,rgb(251_246_234/0.14)_38%,rgb(251_246_234/0.24)_100%)] md:bg-[linear-gradient(to_right,rgb(251_246_234/0.3)_0%,rgb(251_246_234/0.16)_46%,rgb(251_246_234/0.04)_76%,rgb(251_246_234/0)_100%)]"
+        className="absolute inset-0 bg-[linear-gradient(to_bottom,rgb(251_246_234/0.2)_0%,rgb(251_246_234/0.06)_38%,rgb(251_246_234/0.14)_100%)] md:bg-[linear-gradient(to_right,rgb(251_246_234/0.18)_0%,rgb(251_246_234/0.07)_46%,rgb(251_246_234/0.02)_76%,rgb(251_246_234/0)_100%)]"
       />
       <div aria-hidden className="absolute inset-x-0 bottom-0 h-40 bg-linear-to-b from-ivory/0 to-ivory" />
     </div>
