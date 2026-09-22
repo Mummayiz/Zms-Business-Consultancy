@@ -62,7 +62,10 @@ export default function HomePage() {
           </a>
         }
       >
-        <div className="max-w-[48rem]">
+        <div className="relative max-w-[48rem]">
+          {/* Legibility wash, scaled to this block rather than the hero */}
+          <span aria-hidden className="hero-glow" />
+
           {/*
             The deck brief calls for a gold accent on the video hero, as the
             reference has. Ours reads against a bright scene behind an ivory

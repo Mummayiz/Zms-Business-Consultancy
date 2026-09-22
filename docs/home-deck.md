@@ -121,9 +121,10 @@ third of the width tears it open.
 axe-core 4.13, WCAG 2.0/2.1 A and AA, at 390px and 1440px, with the gate up and dismissed:
 **0 violations** in all four states, one `<h1>` throughout.
 
-The hero needed an ivory scrim to get there. Against the supplied footage, navy text measured 2.56:1;
-the wash takes it to 14.35:1 on desktop and 12.07:1 on mobile while leaving the right of the frame
-clear, where no text sits.
+The hero needs an ivory wash to get there. Against the supplied footage, navy text measures 2.56:1
+bare. That wash was a full-bleed scrim to begin with, which is what made the video invisible on
+narrower screens; it is now scaled to the text block, and the per-width figures are in
+"The hero glow, rescaled to the text" below.
 
 Removing the chrome took the page's only decorative text with it. While it existed it had to meet
 contrast like anything else, which is why the numerals were raised to `navy/70` on light slides and
@@ -134,3 +135,53 @@ cue, so nothing reachable was lost — every slide still has its `id`.
 Under `lg` the tile selector is not a tablist at all: the three services render as stacked
 `<article>` elements, so there is nothing to operate by keyboard or pointer that a tap cannot reach.
 From `lg` up it is a tablist with arrow, Home and End keys.
+
+## The hero glow, rescaled to the text
+
+The video was invisible below about 1200px. Two full-bleed layers were responsible: a legibility
+scrim at 0.82–0.95 ivory across the whole hero, and a centred radial glow on top of it. At 768px the
+left two thirds were cream; at 375px only a strip down the right-hand edge of the footage survived.
+
+The wash is now `.hero-glow`, rendered inside the hero's text column and sized to it, so it stays a
+pool behind the headline rather than a full-width wash. The full-bleed layer that remains only takes
+the glare off the footage (0.14–0.34 ivory, down from 0.82–0.95).
+
+Two details matter in the gradient:
+
+- **The ellipse is inscribed in its box** — `50% 50% at 50% 50%`. A gradient wider than the element
+  is still opaque where the element ends, which drew a visible rectangle around the headline. The
+  generous negative inset is what makes an inscribed ellipse work: the box is far larger than the
+  text, so the text sits in the middle three-quarters where the wash is at full strength and the
+  falloff happens in the empty margin.
+- **The plateau runs well past the text.** Contrast here is measured against the darkest pixel behind
+  the headline and the footage is moving, so a shorter plateau measured 10:1 at one width and 3.2:1
+  at another purely on which frame was showing.
+
+Measured per width — worst case over four frames, with the share of the hero still reading as video
+rather than flat ivory:
+
+| width | video visible | headline | lead |
+|---|---|---|---|
+| 375px | 61% | 8.77:1 | 11.96:1 |
+| 390px | 62% | 8.83:1 | 11.95:1 |
+| 768px | 65% | 13.06:1 | 12.64:1 |
+| 1024px | 59% | 7.88:1 | 12.40:1 |
+| 1440px | 73% | 11.96:1 | 12.63:1 |
+| 1920px | 83% | 7.35:1 | 12.53:1 |
+
+Every figure clears AA with room to spare — 3:1 for the headline at that size, 4.5:1 for the lead.
+Before/after screenshots at all six widths are in `review-shots/hero-before` and
+`review-shots/hero-after`.
+
+## The gate now takes focus as it appears
+
+Enter and Space did nothing until the page had been clicked. The cause was not the key handler, which
+was already on `window`: the panel **did not exist yet**. Whether to show it depends on
+`sessionStorage` and the motion preference, so it cannot render on the server and only appears once
+hydration has run — measured at t+300ms after load the gate was absent, focus was on `<body>`, and
+Enter had nothing to dismiss.
+
+`TearGate` now claims focus the instant the panel exists: `autoFocus` on mount, then again from an
+effect on the next frame, since during hydration the element can be in the document a beat before the
+browser will accept focus on it. Verified at t+300ms, t+900ms and t+2000ms after load —
+`document.activeElement` is the dialog and Enter dismisses it with no prior click in all three.

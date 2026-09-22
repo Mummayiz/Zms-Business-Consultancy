@@ -1,7 +1,6 @@
 "use client";
 
 import { m, useTransform, type MotionValue } from "motion/react";
-import { architecturalRise } from "@/lib/motion";
 import { stagger } from "@/lib/scroll";
 
 type ArchitecturalBarsProps = {
@@ -9,24 +8,24 @@ type ArchitecturalBarsProps = {
   heights: number[];
   /** Index of the bar rendered in gold; all others are navy. */
   accentIndex?: number;
-  /** Seconds between each bar starting to rise. */
-  step?: number;
   className?: string;
   barClassName?: string;
   /** "light" = navy bars for ivory surfaces; "navy" = low-contrast ivory bars on navy. */
   tone?: "light" | "navy";
-  /** Scroll progress; when given, bars grow with the scroll instead of on view. */
+  /** Scroll progress; without it the bars render at full height, unanimated. */
   progress?: MotionValue<number>;
 };
 
 /**
  * Slim vertical bars with a slanted top, taken from the proportions of the ZMS mark.
- * Either grows with scroll progress or rises once when its parent enters view.
+ *
+ * They grow with scroll progress and shrink again on the way back up. Without a
+ * progress value — reduced motion, or scenes switched off — they simply stand at
+ * full height; there is no one-shot rise that could latch.
  */
 export function ArchitecturalBars({
   heights,
   accentIndex,
-  step = 0.14,
   className = "",
   barClassName = "",
   tone = "light",
@@ -47,15 +46,9 @@ export function ArchitecturalBars({
               colour={i === accentIndex ? "bg-gold" : baseColour}
             />
           ) : (
-            <m.div
-              variants={architecturalRise}
-              custom={i * step}
-              data-motion
-              className={barClassName}
-              style={{ height: `${h}%`, transformOrigin: "bottom" }}
-            >
+            <div className={barClassName} style={{ height: `${h}%` }}>
               <Slant colour={i === accentIndex ? "bg-gold" : baseColour} />
-            </m.div>
+            </div>
           )}
         </div>
       ))}

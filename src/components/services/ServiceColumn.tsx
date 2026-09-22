@@ -1,16 +1,16 @@
 ﻿"use client";
 
 import { useRef, type ReactNode } from "react";
-import { m, useScroll, useTransform, type MotionStyle } from "motion/react";
+import { m, useTransform, type MotionStyle } from "motion/react";
 import { features } from "@/config/features";
-import { sceneOffset, stagger } from "@/lib/scroll";
+import { stagger } from "@/lib/scroll";
 import { useSceneMotion } from "@/components/motion/useSceneMotion";
-import { Reveal } from "@/components/motion/Reveal";
+import { useScrub } from "@/components/motion/useScrub";
 
 /**
- * One service column. On desktop the top rule extends left to right with the
- * scroll and the content steps in behind it, each column slightly after the
- * last. Elsewhere it falls back to the standard one-shot reveal.
+ * One service column. The top rule extends left to right with the scroll and
+ * the content steps in behind it, each column slightly after the last, and the
+ * whole thing runs in reverse on the way back up.
  *
  * The rule scale travels to the card as a CSS variable, so ServiceCard stays a
  * server component.
@@ -29,14 +29,10 @@ export function ServiceColumn({
   children: ReactNode;
 }) {
   const ref = useRef<HTMLDivElement>(null);
-  const { pointer } = useSceneMotion();
-  const scrollLinked = features.scrollScenes && pointer;
+  const { motion: motionOn } = useSceneMotion();
+  const scrollLinked = features.scrollScenes && motionOn;
 
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: sceneOffset as unknown as ["start 100%", "start 70%"],
-  });
-  const progress = scrollYProgress;
+  const progress = useScrub(ref);
 
   // A column at a time: rule extends, then its content steps in behind it.
   const ruleRange = stagger(index, 0.18, 0.34);
@@ -46,7 +42,7 @@ export function ServiceColumn({
   ];
 
   const ruleScale = useTransform(progress, ruleRange, [0, 1], { clamp: true });
-  const opacity = useTransform(progress, contentRange, [0, 1], { clamp: true });
+  // Transform only, never opacity — see the note in Reveal's useScrubStyle.
   const y = useTransform(progress, contentRange, [56, 0], { clamp: true });
 
   return (
@@ -55,14 +51,12 @@ export function ServiceColumn({
         <m.div
           className="h-full"
           data-motion
-          style={{ "--rule-scale": ruleScale, opacity, y } as unknown as MotionStyle}
+          style={{ "--rule-scale": ruleScale, y } as unknown as MotionStyle}
         >
           {children}
         </m.div>
       ) : (
-        <Reveal delay={index * 0.12} className="h-full">
-          {children}
-        </Reveal>
+        <div className="h-full">{children}</div>
       )}
     </div>
   );

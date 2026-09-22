@@ -133,14 +133,21 @@
 }
 
 /* ---------- Hero entrance (CSS, runs on first paint) ---------- */
-@keyframes hero-bg {
-  from {
-    transform: scale(1.05);
-  }
-  to {
-    transform: scale(1);
-  }
+/*
+ * These tokens used to arrive as inline custom properties from `heroMotionVars`
+ * in lib/motion.ts, set on the old Hero component. The deck rebuild deleted
+ * that component, which left every variable below undefined — and an animation
+ * shorthand with an undefined duration or easing is invalid, so the hero's
+ * entrance silently stopped running. The stylesheet owns them now; the values
+ * match the motion tokens in lib/motion.ts.
+ */
+:root {
+  --motion-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --motion-base: 0.55s;
+  --motion-rise: 0.7s;
+  --motion-travel: 28px;
 }
+
 @keyframes hero-fade-up {
   from {
     opacity: 0;
@@ -151,23 +158,7 @@
     transform: none;
   }
 }
-@keyframes hero-rise {
-  from {
-    transform: scaleY(0);
-  }
-  to {
-    transform: scaleY(1);
-  }
-}
 
-.hero-bg {
-  animation: hero-bg var(--motion-bg) var(--motion-ease) both;
-}
-.hero-line {
-  transform-origin: bottom;
-  animation: hero-rise var(--motion-rise) var(--motion-ease) both;
-  animation-delay: calc(var(--i, 0) * var(--motion-stagger) + 0.1s);
-}
 .hero-step {
   animation: hero-fade-up var(--motion-base) var(--motion-ease) both;
   animation-delay: calc(var(--i, 0) * 0.12s + 0.3s);
@@ -199,6 +190,56 @@
   animation: hero-mask-rise 1s var(--motion-ease) both;
   animation-delay: 0.42s;
   will-change: transform;
+}
+
+/*
+ * Hero legibility glow.
+ *
+ * Sized to the text block it sits inside, not to the hero. Scaling it to the
+ * hero meant that as the viewport narrowed the wash covered everything and the
+ * video disappeared; anchored to the text, it stays a pool behind the headline
+ * and the footage keeps the rest of the frame.
+ *
+ * The bleed is generous on purpose, so the falloff happens outside the text
+ * rather than across the last line of it. z-index sits between the video
+ * (-z-10) and the copy.
+ */
+/*
+ * The ellipse is inscribed in the box — `50% 50% at 50% 50%` — so the wash
+ * reaches zero exactly at every edge and there is nothing to clip. An extent
+ * wider than the box left a visible rectangle around the headline, because the
+ * gradient was still opaque where the element ended.
+ *
+ * The bleed is what makes that work: the box is far larger than the text, so
+ * the text sits inside roughly the middle three-quarters of the ellipse, where
+ * the wash is still at full strength, and the falloff happens in the empty
+ * margin around it.
+ */
+.hero-glow {
+  position: absolute;
+  z-index: -1;
+  inset: -6rem -3.5rem;
+  pointer-events: none;
+  /*
+   * The plateau runs well past the text before it falls away. Contrast here is
+   * measured against the darkest pixel behind the headline, and the footage is
+   * moving: a shorter plateau measured 10:1 at one width and 3.2:1 at another
+   * purely on which frame was showing. Holding ~0.95 across the whole text
+   * makes the composite near-ivory whatever the frame does.
+   */
+  background: radial-gradient(
+    50% 50% at 50% 50%,
+    rgb(251 246 234 / 0.97) 0%,
+    rgb(251 246 234 / 0.965) 62%,
+    rgb(251 246 234 / 0.92) 78%,
+    rgb(251 246 234 / 0.58) 90%,
+    rgb(251 246 234 / 0) 100%
+  );
+}
+@media (min-width: 768px) {
+  .hero-glow {
+    inset: -6rem -13rem;
+  }
 }
 
 /* ---------- Deck ---------- */
@@ -242,8 +283,6 @@
  * the system preference always wins.
  */
 @media (prefers-reduced-motion: reduce) {
-  :root:not([data-force-motion]) .hero-bg,
-  :root:not([data-force-motion]) .hero-line,
   :root:not([data-force-motion]) .hero-step,
   :root:not([data-force-motion]) .hero-mask > *,
   :root:not([data-force-motion]) .deck-cue {

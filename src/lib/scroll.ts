@@ -9,15 +9,12 @@
 /** Spring used to smooth pointer tracking on navy surfaces. */
 export const pointerSpring = { stiffness: 55, damping: 22, mass: 0.6 } as const;
 
-/**
- * Section progress: 0 as the section's top enters the bottom of the viewport,
- * 1 by the time it reaches 70% of the way up.
- *
- * The window deliberately closes early. Sequences scrub both ways, so a
- * section that is on screen while the page is at rest must already be fully
- * built — otherwise its text sits half-faded, which fails contrast.
+/*
+ * The section window itself lives in `useScrub`, expressed against the live
+ * bounding box rather than as a Motion `offset` pair. The offset form cached
+ * the element's document position on mount, which went stale whenever the
+ * layout settled afterwards.
  */
-export const sceneOffset = ["start 100%", "start 70%"] as const;
 
 /** Sub-range for the nth item in a staggered scroll sequence. */
 export function stagger(index: number, step = 0.18, length = 0.5): [number, number] {

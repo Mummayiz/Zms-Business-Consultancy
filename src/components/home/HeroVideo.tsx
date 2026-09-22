@@ -169,19 +169,21 @@ export function HeroVideo() {
       )}
 
       {/*
-        Legibility scrim. The supplied footage is darker and busier than the
-        still it replaces: measured against the video, navy text came in at
-        2.56:1. The ivory wash below carries it past AA while leaving the right
-        of the frame clear, where there is no text.
+        A light wash over the whole frame, and nothing more.
+
+        This layer used to carry the legibility scrim at 0.82–0.95 ivory across
+        the full hero, plus a centred radial glow on top. Together they erased
+        the footage below about 1200px: at 768px the left two thirds were cream,
+        and at 375px only a strip down the right-hand edge survived.
+
+        The wash that makes the headline readable is now scaled to the text
+        block instead — `.hero-glow`, rendered inside the content column — so
+        this layer only has to take the glare off the footage and settle it
+        behind ivory page furniture.
       */}
       <div
         aria-hidden
-        className="absolute inset-0 bg-[linear-gradient(to_bottom,rgb(251_246_234/0.9)_0%,rgb(251_246_234/0.82)_55%,rgb(251_246_234/0.9)_100%)] md:bg-[linear-gradient(to_right,rgb(251_246_234/0.95)_0%,rgb(251_246_234/0.9)_34%,rgb(251_246_234/0.55)_58%,rgb(251_246_234/0.12)_82%,rgb(251_246_234/0)_100%)]"
-      />
-      {/* Soft ivory glow, as on the previous hero */}
-      <div
-        aria-hidden
-        className="absolute inset-0 bg-[radial-gradient(ellipse_85%_55%_at_50%_50%,rgb(251_246_234/0.5)_0%,rgb(251_246_234/0.2)_45%,rgb(251_246_234/0)_78%)] md:bg-[radial-gradient(ellipse_58%_52%_at_34%_52%,rgb(251_246_234/0.55)_0%,rgb(251_246_234/0.25)_50%,rgb(251_246_234/0)_80%)]"
+        className="absolute inset-0 bg-[linear-gradient(to_bottom,rgb(251_246_234/0.34)_0%,rgb(251_246_234/0.14)_38%,rgb(251_246_234/0.24)_100%)] md:bg-[linear-gradient(to_right,rgb(251_246_234/0.3)_0%,rgb(251_246_234/0.16)_46%,rgb(251_246_234/0.04)_76%,rgb(251_246_234/0)_100%)]"
       />
       <div aria-hidden className="absolute inset-x-0 bottom-0 h-40 bg-linear-to-b from-ivory/0 to-ivory" />
     </div>

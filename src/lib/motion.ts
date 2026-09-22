@@ -1,10 +1,10 @@
-import type { CSSProperties } from "react";
-import type { Transition, Variants } from "motion/react";
-
 /*
  * Motion tokens — the single source for timing across the site.
- * Motion variants below and the hero's CSS keyframes (via `heroMotionVars`)
- * both read from these values.
+ *
+ * The hero's CSS entrance keeps its own copy of these in `:root` (globals.css)
+ * rather than receiving them as inline custom properties, so it cannot be
+ * broken again by deleting whichever component happened to set them.
+ *
  * Language: build · rise · travel · connect · progress. Nothing bounces or spins.
  */
 
@@ -14,8 +14,6 @@ export const duration = {
   hover: 0.2,
   base: 0.55,
   rise: 0.7,
-  draw: 1.4,
-  background: 1.4,
 } as const;
 
 /**
@@ -26,81 +24,21 @@ export const duration = {
  */
 export const travel = 48;
 
-/** Shorter travel for the hero's own entrance, which runs in CSS. */
-export const heroTravel = 28;
-
 export const stagger = 0.08;
 
-export const viewport = { once: true, margin: "0px 0px -12% 0px" } as const;
-
 /**
- * Variants accept an optional delay through Motion's `custom` prop.
- * The delay is only set when given, so a parent's stagger timing still applies.
+ * A reveal's slice of its section's scroll window, derived from the stagger
+ * delay it used to be given in seconds.
+ *
+ * Reveals are scroll-linked rather than triggered, so they scrub both ways:
+ * scrolling back up plays them in reverse. Nothing latches.
+ *
+ * The range has to finish by 1. `useScrub` closes the window while the
+ * element's top is still low on the screen, so a reveal that completes at 1 is
+ * fully built by the time it is anywhere readable — which is what keeps
+ * scroll-linked opacity from leaving text half-faded at rest.
  */
-const timed = (t: Transition, delay?: number): Transition => (delay ? { ...t, delay } : t);
-
-export const fadeUp: Variants = {
-  hidden: { opacity: 0, y: travel },
-  visible: (delay?: number) => ({
-    opacity: 1,
-    y: 0,
-    transition: timed({ duration: duration.base, ease }, delay),
-  }),
-};
-
-/** Controlled mask reveal, rising from the bottom edge. */
-export const reveal: Variants = {
-  hidden: { clipPath: "inset(100% 0% 0% 0%)" },
-  visible: (delay?: number) => ({
-    clipPath: "inset(0% 0% 0% 0%)",
-    transition: timed({ duration: duration.rise, ease }, delay),
-  }),
-};
-
-export const scaleIn: Variants = {
-  hidden: { opacity: 0, scale: 1.04 },
-  visible: (delay?: number) => ({
-    opacity: 1,
-    scale: 1,
-    transition: timed({ duration: duration.rise, ease }, delay),
-  }),
-};
-
-/** Vertical growth for architectural bars. Pair with `transformOrigin: "bottom"`. */
-export const architecturalRise: Variants = {
-  hidden: { scaleY: 0 },
-  visible: (delay?: number) => ({
-    scaleY: 1,
-    transition: timed({ duration: duration.rise, ease }, delay),
-  }),
-};
-
-/** A gold line drawing itself along its path. */
-export const lineDraw: Variants = {
-  hidden: { pathLength: 0, opacity: 0 },
-  visible: (delay?: number) => ({
-    pathLength: 1,
-    opacity: 1,
-    transition: {
-      pathLength: timed({ duration: duration.draw, ease }, delay),
-      opacity: timed({ duration: 0.2 }, delay),
-    },
-  }),
-};
-
-export function staggerChildren(delayChildren = 0, each: number = stagger): Variants {
-  return {
-    hidden: {},
-    visible: { transition: { delayChildren, staggerChildren: each } },
-  };
+export function scrubRange(delay = 0): [number, number] {
+  const from = Math.min(delay * 1.1, 0.35);
+  return [from, Math.min(from + 0.65, 1)];
 }
-
-/** CSS custom properties that let the hero's keyframes share these tokens. */
-export const heroMotionVars = {
-  "--motion-ease": `cubic-bezier(${ease.join(", ")})`,
-  "--motion-base": `${duration.base}s`,
-  "--motion-rise": `${duration.rise}s`,
-  "--motion-bg": `${duration.background}s`,
-  "--motion-stagger": `${stagger}s`,
-  "--motion-travel": `${heroTravel}px`,
-} as CSSProperties;

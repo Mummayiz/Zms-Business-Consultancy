@@ -82,10 +82,25 @@ export function TearGate() {
    * Move focus into the panel as soon as it appears, and listen for the
    * keyboard at the window. A handler on the panel alone never fires: focus
    * starts on <body>, and events bubble up, not down — which left Enter dead.
+   *
+   * The panel cannot render on the server: whether to show it depends on
+   * sessionStorage and the motion preference, so it only appears once hydration
+   * has run. Until then there is nothing to focus and nothing to dismiss, which
+   * is why Enter did nothing until the page had been clicked. Focus is now
+   * claimed the instant the panel exists, and again on the next frame — during
+   * hydration the element can be in the document a beat before the browser will
+   * accept focus on it.
    */
   useEffect(() => {
     if (!shouldGate || dismissed) return;
-    panelRef.current?.focus();
+    const panel = panelRef.current;
+    if (!panel) return;
+
+    const claim = () => {
+      if (document.activeElement !== panel) panel.focus({ preventScroll: true });
+    };
+    claim();
+    const frame = requestAnimationFrame(claim);
 
     const onKey = (event: KeyboardEvent) => {
       if (event.key !== "Enter" && event.key !== " " && event.key !== "Spacebar") return;
@@ -97,7 +112,10 @@ export function TearGate() {
     };
 
     window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
+    return () => {
+      cancelAnimationFrame(frame);
+      window.removeEventListener("keydown", onKey);
+    };
   }, [shouldGate, dismissed]);
 
   useEffect(() => {
@@ -148,6 +166,8 @@ export function TearGate() {
         }
       }}
       tabIndex={-1}
+      // Claimed on mount, which lands a frame before the effect above.
+      autoFocus
       className={`fixed inset-0 z-[70] touch-pan-y select-none ${open ? "pointer-events-none" : ""}`}
       style={{ transition: open ? "opacity 700ms var(--ease-zms)" : undefined, opacity: open ? 0 : 1 }}
     >

@@ -7,7 +7,7 @@ import { Orbit } from "@/components/brand/Orbit";
 
 /**
  * The hero's gold divider. It draws itself as the visitor scrolls out of the
- * hero rather than on load, and holds its finished state afterwards.
+ * hero rather than on load, and un-draws as they scroll back to the top.
  *
  * Progress comes from the page scroll rather than this element: the divider
  * sits at the very bottom of the hero, so measuring its own box would mean the

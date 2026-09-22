@@ -233,3 +233,105 @@ devDependency with an `npm run verify:motion` script so this runs from the repo.
    "gold must remain an accent" allows. Gold is still the hover state.
 5. **Grain stays on under reduced motion.** It is a static texture with no movement, and the spec
    lists only motion effects to disable. Turning it off there too is a one-line change if preferred.
+
+---
+
+# Scroll-linked rebuild: removing the play-once latch
+
+Every scroll-linked sequence now scrubs in both directions — it builds on the way down and un-builds
+on the way up. Nothing latches, and nothing holds a finished state.
+
+## What was latched, and what replaced it
+
+| | Before | After |
+|---|---|---|
+| Section reveals (`Reveal`, `RevealGroup`, `RevealItem`) | `whileInView` + `viewport={{ once: true }}` | Scroll-linked, continuous |
+| Signature arc | `whileInView` + `once` | Scroll-linked (`Orbit` measures its own box) |
+| Process bars and gold curve | Scroll-linked on desktop, one-shot reveal on phones | Scroll-linked everywhere |
+| Service column reveals | Scroll-linked on desktop only, `Reveal` fallback elsewhere | Scroll-linked wherever motion is allowed |
+| Hero/intro divider | Already scrubbed; the doc comment wrongly claimed it latched | Unchanged, comment corrected |
+
+`viewport`, `fadeUp`, `reveal`, `scaleIn`, `architecturalRise`, `lineDraw` and `staggerChildren` were
+the variants those triggers used and are gone with them, along with `VariantOrbit` and `sceneOffset`.
+With motion off — reduced motion, or `features.scrollScenes` disabled — each component renders a
+plain static branch with no transform at all, so there is no state left to get stuck in.
+
+## Reveals are transform-only, never opacity
+
+This is the one substantive deviation, and it came out of the accessibility gate.
+
+axe evaluates every element in the document, including those below the fold, and it composites
+ancestor opacity into its contrast maths. A scroll-linked *fade* therefore leaves whichever section
+straddles the build window sitting at a fractional opacity whenever the page is at rest — and axe
+reads that as failing text. Measured on /approach with fades in place:
+
+```
+[serious] color-contrast (4)
+  li[data-motion] > .type-card        1.79:1  (#b8bbb6 on #fbf6ea)  expected 3:1
+  li[data-motion] > .type-label       1.73:1  (#bcbeb8 on #fbf6ea)  expected 4.5:1
+```
+
+The latched version escaped this only because its resting state was exactly opacity 0, which axe
+skips as invisible. Scrubbing has no such resting state.
+
+So the build is carried by `translateY`, `scale` and `clip-path` instead, and no reveal touches
+opacity. Both are compositor-cheap and neither changes the rendered colour of text. The guarantee
+that falls out is stronger than a fade could give: **copy is legible at every scroll position, in
+either direction, because it is never less than fully opaque.** Measured minimum opacity across five
+pages at every scroll stop: **1.000**.
+
+## The window, and why text is never caught mid-build
+
+`useScrub` expresses the window against the viewport, not the document:
+
+```
+element top = 1.02 × vh  →  progress 0   (just below the fold)
+element top = 0.78 × vh  →  progress 1   (low on screen, but readable)
+```
+
+Anything whose top is above `0.78 × vh` is clamped to 1. A reveal animates visibly as it rises
+through the bottom of the screen and is finished by the time it reaches anywhere readable.
+
+## Two bugs found while building it
+
+**`useScroll({ target, offset })` caches a stale measurement.** It measures its target's document
+position on mount, with no invalidation. On /services/[slug] the layout settled after Motion had
+measured, so two sections held a window that was wrong by roughly a thousand pixels and sat at
+opacity 0 — on screen and unreadable — until the page was scrolled well past them. `useScrub`
+replaces it: position comes from the `offsetTop` chain and is re-measured on resize, `load`,
+`document.fonts.ready` and a `ResizeObserver` on both the element and the body.
+
+`offsetTop` rather than `getBoundingClientRect()` is deliberate. A rect is the *transformed* box, and
+these reveals translate their own element — so a rect-derived progress feeds back into itself and
+settles differently depending on which direction you arrived from. Measured as up to 48px of
+hysteresis at the same scroll position before the change.
+
+**A motion value set by hand never reaches the DOM.** The first version kept the position in a ref
+and pushed the result into a standalone `useMotionValue`. It computed the correct number and nothing
+moved: the caller's derived `useTransform` had subscribed to a value Motion did not know was
+changing, so every reveal held its initial style until a scroll event happened to nudge the graph.
+Progress is now *derived* — `useTransform([scrollY, docTop, viewport], …)` — so a re-measure
+propagates on its own.
+
+## Verified
+
+Five pages (`/`, `/services`, `/approach`, `/about`, `/services/project-management`), sampled at
+300px scroll increments, three passes each — down, down again, then up:
+
+```
+2nd-down-vs-up mismatch = 0   on every page      (no hysteresis: reversing is exact)
+minimum opacity         = 1.000 on every page    (nothing can be invisible)
+max translate           = 48px                   (the motion is actually there)
+```
+
+Running the first pass against the second isolates one remaining artefact: for up to about two
+seconds after load, reveals show finished content. That is `LazyMotion` — `domAnimation` arrives as a
+dynamic import, and until it resolves `m` components ignore motion values. It predates this work,
+affects only below-the-fold content, and errs in the safe direction. `1st-vs-2nd-down` and
+`1st-vs-up` are identical on all five pages, which is what shows the difference is startup and not
+direction.
+
+axe-core: **0 violations** across all 11 pages at 390px and 1440px, one `<h1>` each. Lighthouse after
+the change: /approach mobile **98** (a11y 100, TBT 41ms), desktop 100; Home mobile **90**, desktop
+100, CLS 0. Under reduced motion every `[data-motion]` element renders at opacity 1.000 with no
+transform.

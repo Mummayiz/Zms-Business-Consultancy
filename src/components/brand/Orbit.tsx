@@ -1,8 +1,11 @@
 "use client";
 
-import { m, type MotionValue } from "motion/react";
-import { useId } from "react";
-import { lineDraw, viewport } from "@/lib/motion";
+import { m, useTransform, type MotionValue } from "motion/react";
+import { useId, useRef } from "react";
+import { features } from "@/config/features";
+import { scrubRange } from "@/lib/motion";
+import { useSceneMotion } from "@/components/motion/useSceneMotion";
+import { useScrub } from "@/components/motion/useScrub";
 
 /*
  * Simplified orbit paths inspired by the logo's gold ring — never a trace of it.
@@ -33,42 +36,56 @@ type OrbitProps = {
   variant: Variant;
   className?: string;
   delay?: number;
-  /** Drives the draw from a parent's variant state instead of its own viewport trigger. */
-  controlled?: boolean;
-  /** Scroll-linked draw: 0 = undrawn, 1 = complete. Overrides the viewport trigger. */
+  /** Scroll-linked draw from a parent's own window: 0 = undrawn, 1 = complete. */
   progress?: MotionValue<number>;
 };
 
 /*
- * The two modes are separate components on purpose. `useSceneMotion` settles
- * after mount, so a component can switch from the variant-driven path to the
- * scroll-linked one; rendering different component types makes React remount
- * the SVG, which clears any half-applied variant state (otherwise the path
- * stays stuck in its "hidden" opacity).
+ * Every mode is a separate component on purpose. `useSceneMotion` settles after
+ * mount, so a component switches path once its answer arrives; rendering a
+ * different component type makes React remount the SVG, which clears any
+ * half-applied style (otherwise the path can stay stuck at its hidden opacity).
+ *
+ * The draw scrubs with the scroll in both directions. It used to be a
+ * `whileInView` trigger with `once: true`, which left the arc drawn for good
+ * after one pass.
  */
-export function Orbit({ variant, className, delay = 0, controlled = false, progress }: OrbitProps) {
-  return progress ? (
-    <ScrollOrbit variant={variant} className={className} progress={progress} />
-  ) : (
-    <VariantOrbit variant={variant} className={className} delay={delay} controlled={controlled} />
-  );
+export function Orbit({ variant, className, delay = 0, progress }: OrbitProps) {
+  const { motion: motionOn } = useSceneMotion();
+
+  // A parent's window wins: the hero divider and the process curve time their
+  // draw against a sequence rather than against the SVG's own box.
+  if (progress) return <ScrollOrbit variant={variant} className={className} progress={progress} />;
+  if (features.scrollScenes && motionOn)
+    return <SelfScrollOrbit variant={variant} className={className} delay={delay} />;
+  return <StaticOrbit variant={variant} className={className} />;
 }
 
 function Shell({
   variant,
   className,
   gradientId,
+  svgRef,
   children,
   ...rest
 }: {
   variant: Variant;
   className?: string;
   gradientId: string;
+  svgRef?: React.Ref<SVGSVGElement>;
   children: React.ReactNode;
 } & Record<string, unknown>) {
   const { viewBox, fade } = paths[variant];
   return (
-    <m.svg viewBox={viewBox} preserveAspectRatio="none" aria-hidden focusable="false" className={className} {...rest}>
+    <m.svg
+      ref={svgRef}
+      viewBox={viewBox}
+      preserveAspectRatio="none"
+      aria-hidden
+      focusable="false"
+      className={className}
+      {...rest}
+    >
       {fade && (
         <defs>
           <linearGradient id={gradientId} x1="0" y1="0" x2="1" y2="0">
@@ -115,24 +132,35 @@ function ScrollOrbit({
   );
 }
 
-/** Draws once when it scrolls into view, or when a parent switches variant. */
-function VariantOrbit({
+/** Draws in step with the scroll across its own box, in both directions. */
+function SelfScrollOrbit({
   variant,
   className,
   delay,
-  controlled,
 }: {
   variant: Variant;
   className?: string;
   delay: number;
-  controlled: boolean;
 }) {
   const gradientId = `orbit-fade-${useId()}`;
-  const trigger = controlled ? {} : { initial: "hidden", whileInView: "visible", viewport };
+  const ref = useRef<SVGSVGElement>(null);
+  // useScrub only reads a bounding box, which an SVG element reports the same way.
+  const progress = useScrub(ref as unknown as React.RefObject<HTMLElement>);
+  const pathLength = useTransform(progress, scrubRange(delay), [0, 1], { clamp: true });
 
   return (
-    <Shell variant={variant} className={className} gradientId={gradientId} {...trigger}>
-      <m.path {...strokeProps(variant, gradientId)} data-motion variants={lineDraw} custom={delay} />
+    <Shell variant={variant} className={className} gradientId={gradientId} svgRef={ref}>
+      <m.path {...strokeProps(variant, gradientId)} data-motion initial={false} style={{ pathLength, opacity: 1 }} />
+    </Shell>
+  );
+}
+
+/** Fully drawn, with nothing animating: reduced motion, or scenes switched off. */
+function StaticOrbit({ variant, className }: { variant: Variant; className?: string }) {
+  const gradientId = `orbit-fade-${useId()}`;
+  return (
+    <Shell variant={variant} className={className} gradientId={gradientId}>
+      <path {...strokeProps(variant, gradientId)} />
     </Shell>
   );
 }
